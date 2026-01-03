@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firewall Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        
+        .container { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .box { background: #222; border: 1px solid #444; border-radius: 10px; padding: 20px; width: 45%; height: 400px; overflow-y: auto; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; border-bottom: 2px solid #555; padding: 10px; position: sticky; top: 0; background: #222; z-index: 2; }
+        td { text-align: left; padding: 8px; border-bottom: 1px solid #333; font-family: monospace; font-size: 14px; }
+        
+        .text-green { color: #00ff00; }
+        .text-red { color: #ff4444; font-weight: bold; }
+        
+        button { padding: 15px 30px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; margin: 10px; color: white; font-weight: bold; transition: 0.2s; }
+        .btn-green { background: #008000; } .btn-green:hover { background: #00aa00; transform: scale(1.05); }
+        .btn-red { background: #b30000; } .btn-red:hover { background: #ff0000; transform: scale(1.05); }
+
+        .chart-container { height: 250px; width: 80%; margin: auto; background: #1a1a1a; padding: 15px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1 style="color: #ccc;">🛡️ NETWORK SECURITY CENTER</h1>
+
+    <div>
+        <button class="btn-green" onclick="send('normal')">🟢 INJECT NORMAL TRAFFIC</button>
+        <button class="btn-red" onclick="send('attack')">🔴 LAUNCH DDoS ATTACK</button>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="trafficChart"></canvas>
+    </div>
+
+    <div class="container">
+        <div class="box" style="border-top: 4px solid #00ff00;">
+            <h3 class="text-green">✅ ALLOWED TRAFFIC</h3>
+            <table>
+                <thead><tr><th>ID</th><th>IP Address</th><th>Info</th></tr></thead>
+                <tbody id="safeTable"></tbody>
+            </table>
+        </div>
+
+        <div class="box" style="border-top: 4px solid #ff0000;">
+            <h3 class="text-red">🚨 BLOCKED ATTACKS</h3>
+            <table>
+                <thead><tr><th>ID</th><th>IP Address</th><th>Reason</th></tr></thead>
+                <tbody id="attackTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. GRAPH CONFIGURATION ---
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(30).fill(''),
+                datasets: [
+                    { 
+                        label: 'Normal Traffic', 
+                        borderColor: '#00ff00', 
+                        backgroundColor: 'rgba(0, 255, 0, 0.1)', 
+                        data: Array(30).fill(0), 
+                        fill: true, 
+                        tension: 0.1 
+                    },
+                    { 
+                        label: 'Attack Spikes', 
+                        borderColor: '#ff0000', 
+                        backgroundColor: 'rgba(255, 0, 0, 0.5)', 
+                        data: Array(30).fill(0), 
+                        fill: true, 
+                        tension: 0.1 
+                    }
+                ]
+            },
+            options: { 
+                animation: false, 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        suggestedMax: 5,
+                        grid: { color: '#333' } // Dark grid lines
+                    },
+                    x: { display: false } // Hide X axis
+                },
+                elements: { 
+                    point: { radius: 0 } // Hide dots for cleaner look
+                }
+            }
+        });
+
+        // --- 2. SEND COMMAND TO PYTHON ---
+        function send(type) {
+            fetch('/trigger', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: type})
+            });
+        }
+
+        // --- 3. VARIABLES TO TRACK HISTORY ---
+        let lastGreen = -1; // -1 means "First Load" (Don't spike yet)
+        let lastRed = -1;
+
+        // --- 4. MAIN UPDATE LOOP (Every 300ms) ---
+        setInterval(() => {
+            fetch('/logs').then(res => res.json()).then(data => {
+                
+                const safeTable = document.getElementById('safeTable');
+                const attackTable = document.getElementById('attackTable');
+                
+                // Variables for current count
+                let currGreen = 0;
+                let currRed = 0;
+                let safeHTML = "";
+                let attackHTML = "";
+
+                // Loop through data backwards (Newest first)
+                for (let i = data.length - 1; i >= 0; i--) {
+                    let log = data[i];
+                    if (log.type === 'G') {
+                        currGreen++;
+                        safeHTML += `<tr><td>${log.id}</td><td class="text-green">${log.ip}</td><td>${log.info}</td></tr>`;
+                    } else {
+                        currRed++;
+                        attackHTML += `<tr><td>${log.id}</td><td class="text-red">${log.ip}</td><td>${log.info}</td></tr>`;
+                    }
+                }
+                
+                // Update HTML Tables
+                safeTable.innerHTML = safeHTML;
+                attackTable.innerHTML = attackHTML;
+
+                // Calculate Graph Spikes
+                let spikeGreen = 0;
+                let spikeRed = 0;
+
+                // If this is the FIRST load, just sync numbers (No Spike)
+                if (lastGreen === -1) {
+                    lastGreen = currGreen;
+                    lastRed = currRed;
+                } else {
+                    // Normal operation: Spike = New Logs - Old Logs
+                    spikeGreen = Math.max(0, currGreen - lastGreen);
+                    spikeRed = Math.max(0, currRed - lastRed);
+                    
+                    lastGreen = currGreen;
+                    lastRed = currRed;
+                }
+
+                // Update Graph Data Points
+                chart.data.datasets[0].data.push(spikeGreen);
+                chart.data.datasets[0].data.shift();
+                
+                chart.data.datasets[1].data.push(spikeRed);
+                chart.data.datasets[1].data.shift();
+                
+                chart.update();
+
+            }).catch(e => {}); // Ignore errors if server is busy
+        }, 300); 
+    </script>
+</body>
+</html>
