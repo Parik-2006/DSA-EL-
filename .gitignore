@@ -1,7 +1,16 @@
+# --- KEEP THESE (Do NOT ignore) ---
+# backend.c
+# app.py
+# requirements.txt
+# build.sh
+# start.sh
+# blocked_ips.txt
+
+# --- IGNORE THESE (Do NOT upload) ---
 logs.json
 logs_defense.json
 trie_view.json
 cmd_*.txt
-*.exe
-backend
+*.exe          <-- Ignores Windows executables
+backend        <-- Ignores the Linux binary created during testing
 __pycache__/
