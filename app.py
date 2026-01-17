@@ -2,9 +2,8 @@ from flask import Flask, jsonify, render_template, request
 import json
 import os
 import logging
-import subprocess
 
-# Silence Flask default logs
+# Silence Flask default logs to keep terminal clean
 log = logging.getLogger("werkzeug")
 log.setLevel(logging.ERROR)
 
@@ -29,7 +28,7 @@ def defense():
     return render_template("defense.html")
 
 
-# -------------------- LEGACY TRIGGER --------------------
+# -------------------- LEGACY SYSTEM TRIGGER --------------------
 
 @app.route("/trigger_legacy", methods=["POST"])
 def trigger_legacy():
@@ -37,20 +36,21 @@ def trigger_legacy():
     action = data.get("action", "normal")
     user_ip = data.get("ip", "0.0.0.0")
 
+    # Determine which file to write to based on action
     filename = "cmd_legacy_normal.txt" if action == "normal" else "cmd_legacy_attack.txt"
 
     try:
         with open(filename, "w") as f:
             f.write(user_ip)
             f.flush()
-            os.fsync(f.fileno())
+            os.fsync(f.fileno())  # Ensure data is written to disk immediately
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     return jsonify({"status": "sent"})
 
 
-# -------------------- DEFENSE TRIGGER --------------------
+# -------------------- DEFENSE SYSTEM TRIGGER --------------------
 
 @app.route("/trigger_defense", methods=["POST"])
 def trigger_defense():
@@ -71,32 +71,15 @@ def trigger_defense():
     return jsonify({"status": "sent"})
 
 
-# -------------------- C PROGRAM EXECUTION --------------------
-
-@app.route("/run_c")
-def run_c_program():
-    try:
-        result = subprocess.run(
-            ["./backend"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        return jsonify({
-            "output": result.stdout,
-            "error": result.stderr
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-# -------------------- LOGS & RULES --------------------
+# -------------------- LOGS & RULES API --------------------
 
 @app.route("/logs")
 def logs_old():
     try:
-        with open("logs.json") as f:
-            return jsonify(json.load(f))
+        if os.path.exists("logs.json"):
+            with open("logs.json", "r") as f:
+                return jsonify(json.load(f))
+        return jsonify([])
     except:
         return jsonify([])
 
@@ -104,8 +87,10 @@ def logs_old():
 @app.route("/logs_defense")
 def logs_new():
     try:
-        with open("logs_defense.json") as f:
-            return jsonify(json.load(f))
+        if os.path.exists("logs_defense.json"):
+            with open("logs_defense.json", "r") as f:
+                return jsonify(json.load(f))
+        return jsonify([])
     except:
         return jsonify([])
 
@@ -113,25 +98,32 @@ def logs_new():
 @app.route("/trie_rules")
 def trie_rules():
     try:
-        with open("trie_view.json") as f:
-            return jsonify(json.load(f))
+        if os.path.exists("trie_view.json"):
+            with open("trie_view.json", "r") as f:
+                return jsonify(json.load(f))
+        return jsonify([])
     except:
         return jsonify([])
 
 
-# -------------------- NO-CACHE FIX --------------------
+# -------------------- CACHE CONTROL (CRITICAL) --------------------
 
 @app.after_request
 def add_no_cache_headers(response):
+    """
+    Prevents the browser from caching JSON data.
+    Ensures the dashboard always shows live data from the C backend.
+    """
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
 
 
-# -------------------- SERVER START --------------------
+# -------------------- SERVER ENTRY POINT --------------------
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    print(f"Server running on port {port}")
+    print(f"Server starting on port {port}...")
+    # On Render, 'gunicorn' handles the run, but this is kept for local testing
     app.run(host="0.0.0.0", port=port)
