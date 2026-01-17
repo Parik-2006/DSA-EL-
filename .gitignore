@@ -1,6 +1,7 @@
-# Ignore data files so "Old Data" doesn't get uploaded
-*.json
-*.txt
+logs.json
+logs_defense.json
+trie_view.json
+cmd_*.txt
 *.exe
 backend
 __pycache__/

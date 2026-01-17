@@ -230,7 +230,7 @@ int main() {
             }
         }
 
-        SLEEP_MS(50); // Replaced Sleep() with Cross-Platform Macro
+        SLEEP_MS(50); 
     }
     return 0;
 }
