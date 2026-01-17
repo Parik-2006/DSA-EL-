@@ -1,130 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Firewall Monitor</title>
+    <title>Legacy Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #111; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        
         .container { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
         .box { background: #222; border: 1px solid #444; border-radius: 10px; padding: 20px; width: 45%; height: 400px; overflow-y: auto; }
         
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; border-bottom: 2px solid #555; padding: 10px; position: sticky; top: 0; background: #222; z-index: 2; }
         td { text-align: left; padding: 8px; border-bottom: 1px solid #333; font-family: monospace; font-size: 14px; }
+        .text-green { color: #00ff00; } .text-red { color: #ff4444; font-weight: bold; }
         
-        .text-green { color: #00ff00; }
-        .text-red { color: #ff4444; font-weight: bold; }
+        /* INPUT & MESSAGE STYLING */
+        input { padding: 12px; font-size: 16px; width: 250px; border-radius: 5px; border: 1px solid #444; background: #000; color: white; text-align: center; }
+        input:focus { outline: none; border-color: #0088ff; }
         
+        .message-box {
+            display: none; /* Hidden by default */
+            background: #ffcc00; color: #000; font-weight: bold;
+            padding: 10px; border-radius: 5px; margin: 15px auto; width: 50%;
+            border: 2px solid #ff9900;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         button { padding: 15px 30px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; margin: 10px; color: white; font-weight: bold; transition: 0.2s; }
         .btn-green { background: #008000; } .btn-green:hover { background: #00aa00; transform: scale(1.05); }
         .btn-red { background: #b30000; } .btn-red:hover { background: #ff0000; transform: scale(1.05); }
-
         .chart-container { height: 250px; width: 80%; margin: auto; background: #1a1a1a; padding: 15px; border-radius: 10px; }
+        .back-btn { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #888; border: 1px solid #444; padding: 5px 15px; border-radius: 5px; }
     </style>
 </head>
 <body>
-
-    <h1 style="color: #ccc;">🛡️ NETWORK SECURITY CENTER</h1>
+    <a href="/" class="back-btn">← Home</a>
+    <h1 style="color: #ccc;">🛡️ LEGACY TRAFFIC ANALYZER</h1>
 
     <div>
-        <button class="btn-green" onclick="send('normal')">🟢 INJECT NORMAL TRAFFIC</button>
-        <button class="btn-red" onclick="send('attack')">🔴 LAUNCH DDoS ATTACK</button>
+        <input type="text" id="ipInput" placeholder="Enter IP (e.g. 192.168.1.1)">
     </div>
 
-    <div class="chart-container">
-        <canvas id="trafficChart"></canvas>
+    <div id="msgBox" class="message-box">
+        ⚠️ INVALID IP FORMAT<br>
+        <span style="font-size: 12px; font-weight: normal;">
+            Rule: An IPv4 address must contain 4 numbers (0-255) separated by dots.<br>
+            Example: 192.168.1.5
+        </span>
     </div>
+
+    <div>
+        <button class="btn-green" onclick="send('normal')">ANALYZE PACKET (Green)</button>
+        <button class="btn-red" onclick="send('attack')">SIMULATE ATTACK (Red)</button>
+    </div>
+
+    <div class="chart-container"><canvas id="trafficChart"></canvas></div>
 
     <div class="container">
         <div class="box" style="border-top: 4px solid #00ff00;">
-            <h3 class="text-green">✅ ALLOWED TRAFFIC</h3>
-            <table>
-                <thead><tr><th>ID</th><th>IP Address</th><th>Info</th></tr></thead>
-                <tbody id="safeTable"></tbody>
-            </table>
+            <h3 class="text-green">✅ GOOD TRAFFIC</h3>
+            <table><thead><tr><th>ID</th><th>IP Address</th><th>Info (Class/Validity)</th></tr></thead><tbody id="safeTable"></tbody></table>
         </div>
-
         <div class="box" style="border-top: 4px solid #ff0000;">
-            <h3 class="text-red">🚨 BLOCKED ATTACKS</h3>
-            <table>
-                <thead><tr><th>ID</th><th>IP Address</th><th>Reason</th></tr></thead>
-                <tbody id="attackTable"></tbody>
-            </table>
+            <h3 class="text-red">🚨 ATTACK LOGS</h3>
+            <table><thead><tr><th>ID</th><th>IP Address</th><th>Status</th></tr></thead><tbody id="attackTable"></tbody></table>
         </div>
     </div>
 
     <script>
-        // --- 1. GRAPH CONFIGURATION ---
-        const ctx = document.getElementById('trafficChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array(30).fill(''),
-                datasets: [
-                    { 
-                        label: 'Normal Traffic', 
-                        borderColor: '#00ff00', 
-                        backgroundColor: 'rgba(0, 255, 0, 0.1)', 
-                        data: Array(30).fill(0), 
-                        fill: true, 
-                        tension: 0.1 
-                    },
-                    { 
-                        label: 'Attack Spikes', 
-                        borderColor: '#ff0000', 
-                        backgroundColor: 'rgba(255, 0, 0, 0.5)', 
-                        data: Array(30).fill(0), 
-                        fill: true, 
-                        tension: 0.1 
-                    }
-                ]
-            },
-            options: { 
-                animation: false, 
-                responsive: true, 
-                maintainAspectRatio: false,
-                scales: { 
-                    y: { 
-                        beginAtZero: true, 
-                        suggestedMax: 5,
-                        grid: { color: '#333' } // Dark grid lines
-                    },
-                    x: { display: false } // Hide X axis
-                },
-                elements: { 
-                    point: { radius: 0 } // Hide dots for cleaner look
-                }
-            }
-        });
+        // --- 1. VALIDATION LOGIC ---
+        function checkIPAndShowMessage() {
+            const ip = document.getElementById('ipInput').value;
+            const msgBox = document.getElementById('msgBox');
+            
+            // Regex for 0-255 in 4 blocks
+            const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
-        // --- 2. SEND COMMAND TO PYTHON ---
+            if (ip.length > 0 && !ipRegex.test(ip)) {
+                msgBox.style.display = 'block'; // Show warning
+            } else {
+                msgBox.style.display = 'none';  // Hide warning
+            }
+        }
+
+        // --- 2. SEND COMMAND ---
         function send(type) {
-            fetch('/trigger', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: type})
+            // STEP A: Run Validation Message Check
+            checkIPAndShowMessage();
+
+            // STEP B: Send to Backend (So it also logs the error in the table)
+            const ip = document.getElementById('ipInput').value || "0.0.0.0";
+            fetch('/trigger_legacy', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({action: type, ip: ip}) 
             });
         }
 
-        // --- 3. VARIABLES TO TRACK HISTORY ---
-        let lastGreen = -1; // -1 means "First Load" (Don't spike yet)
-        let lastRed = -1;
+        // --- 3. GRAPH & POLLING LOGIC ---
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: Array(30).fill(''), datasets: [{ label: 'Normal', borderColor: '#00ff00', backgroundColor: 'rgba(0, 255, 0, 0.1)', data: Array(30).fill(0), fill: true, tension: 0.1 }, { label: 'Floods', borderColor: '#ff0000', backgroundColor: 'rgba(255, 0, 0, 0.5)', data: Array(30).fill(0), fill: true, tension: 0.1 }] },
+            options: { animation: false, responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, suggestedMax: 5, grid: { color: '#333' } }, x: { display: false } }, elements: { point: { radius: 0 } } }
+        });
 
-        // --- 4. MAIN UPDATE LOOP (Every 300ms) ---
+        let lastGreen = -1, lastRed = -1;
         setInterval(() => {
             fetch('/logs').then(res => res.json()).then(data => {
-                
                 const safeTable = document.getElementById('safeTable');
                 const attackTable = document.getElementById('attackTable');
-                
-                // Variables for current count
-                let currGreen = 0;
-                let currRed = 0;
-                let safeHTML = "";
-                let attackHTML = "";
+                let currGreen = 0, currRed = 0, safeHTML = "", attackHTML = "";
 
-                // Loop through data backwards (Newest first)
                 for (let i = data.length - 1; i >= 0; i--) {
                     let log = data[i];
                     if (log.type === 'G') {
@@ -135,38 +123,18 @@
                         attackHTML += `<tr><td>${log.id}</td><td class="text-red">${log.ip}</td><td>${log.info}</td></tr>`;
                     }
                 }
-                
-                // Update HTML Tables
                 safeTable.innerHTML = safeHTML;
                 attackTable.innerHTML = attackHTML;
 
-                // Calculate Graph Spikes
-                let spikeGreen = 0;
-                let spikeRed = 0;
-
-                // If this is the FIRST load, just sync numbers (No Spike)
-                if (lastGreen === -1) {
-                    lastGreen = currGreen;
-                    lastRed = currRed;
-                } else {
-                    // Normal operation: Spike = New Logs - Old Logs
-                    spikeGreen = Math.max(0, currGreen - lastGreen);
-                    spikeRed = Math.max(0, currRed - lastRed);
-                    
-                    lastGreen = currGreen;
-                    lastRed = currRed;
+                if (lastGreen !== -1) {
+                    chart.data.datasets[0].data.push(Math.max(0, currGreen - lastGreen));
+                    chart.data.datasets[0].data.shift();
+                    chart.data.datasets[1].data.push(Math.max(0, currRed - lastRed));
+                    chart.data.datasets[1].data.shift();
+                    chart.update();
                 }
-
-                // Update Graph Data Points
-                chart.data.datasets[0].data.push(spikeGreen);
-                chart.data.datasets[0].data.shift();
-                
-                chart.data.datasets[1].data.push(spikeRed);
-                chart.data.datasets[1].data.shift();
-                
-                chart.update();
-
-            }).catch(e => {}); // Ignore errors if server is busy
+                lastGreen = currGreen; lastRed = currRed;
+            }).catch(e => {});
         }, 300); 
     </script>
 </body>

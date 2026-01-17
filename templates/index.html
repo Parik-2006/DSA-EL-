@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security System Hub</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        h1 { color: #ccc; margin-bottom: 40px; letter-spacing: 2px; }
+        .container { display: flex; gap: 40px; }
+        .card { background: #1a1a1a; border: 1px solid #333; padding: 40px; border-radius: 15px; width: 300px; text-align: center; transition: 0.3s; cursor: pointer; text-decoration: none; color: white; }
+        .card:hover { transform: translateY(-5px); border-color: #555; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .icon { font-size: 50px; margin-bottom: 20px; display: block; }
+        h2 { margin: 0 0 10px 0; font-size: 22px; }
+        p { color: #888; font-size: 14px; line-height: 1.5; }
+        .red { color: #ff4444; }
+        .blue { color: #0088ff; }
+    </style>
+</head>
+<body>
+    <h1>NETWORK SECURITY PROJECT</h1>
+    <div class="container">
+        <a href="/attack" class="card" style="border-top: 4px solid #ff4444;">
+            <span class="icon">⚠️</span>
+            <h2 class="red">Legacy System</h2>
+            <p>Phase 1 Implementation</p>
+            <p>Uses Linear Search (O(N))<br>Basic Array Logging</p>
+        </a>
+
+        <a href="/defense" class="card" style="border-top: 4px solid #0088ff;">
+            <span class="icon">🛡️</span>
+            <h2 class="blue">Defense System</h2>
+            <p>Phase 2 Implementation</p>
+            <p>Uses Trie (O(1) Blocking)<br>Circular Queue Memory</p>
+        </a>
+    </div>
+</body>
+</html>
