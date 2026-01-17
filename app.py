@@ -37,15 +37,13 @@ def trigger_legacy():
     action = data.get("action", "normal")
     user_ip = data.get("ip", "0.0.0.0")
 
-    filename = (
-        "cmd_legacy_normal.txt"
-        if action == "normal"
-        else "cmd_legacy_attack.txt"
-    )
+    filename = "cmd_legacy_normal.txt" if action == "normal" else "cmd_legacy_attack.txt"
 
     try:
         with open(filename, "w") as f:
             f.write(user_ip)
+            f.flush()
+            os.fsync(f.fileno())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -60,15 +58,13 @@ def trigger_defense():
     action = data.get("action", "normal")
     user_ip = data.get("ip", "0.0.0.0")
 
-    filename = (
-        "cmd_defense_normal.txt"
-        if action == "normal"
-        else "cmd_defense_attack.txt"
-    )
+    filename = "cmd_defense_normal.txt" if action == "normal" else "cmd_defense_attack.txt"
 
     try:
         with open(filename, "w") as f:
             f.write(user_ip)
+            f.flush()
+            os.fsync(f.fileno())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -76,7 +72,6 @@ def trigger_defense():
 
 
 # -------------------- C PROGRAM EXECUTION --------------------
-# (optional demo endpoint)
 
 @app.route("/run_c")
 def run_c_program():
@@ -124,9 +119,19 @@ def trie_rules():
         return jsonify([])
 
 
+# -------------------- NO-CACHE FIX --------------------
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 # -------------------- SERVER START --------------------
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # REQUIRED for Render
+    port = int(os.environ.get("PORT", 5000))
     print(f"Server running on port {port}")
     app.run(host="0.0.0.0", port=port)
