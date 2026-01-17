@@ -114,7 +114,20 @@ def add_no_cache_headers(response):
     response.headers["Expires"] = "0"
     return response
 
+# -------------------- SYSTEM RESET --------------------
 
+@app.route("/trigger_reset", methods=["POST"])
+def trigger_reset():
+    try:
+        # Create the file that tells C backend to wipe memory
+        with open("cmd_reset.txt", "w") as f:
+            f.write("RESET")
+            f.flush()
+            os.fsync(f.fileno())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    return jsonify({"status": "reset"})
 # -------------------- SERVER START --------------------
 
 if __name__ == "__main__":

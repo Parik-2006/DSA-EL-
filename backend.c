@@ -192,6 +192,25 @@ int main() {
     char ip[32], info[64];
 
     while (1) {
+        
+        // --- RESET TRIGGER (NEW FEATURE) ---
+        if (check_and_read("cmd_reset.txt", ip)) {
+            // Clear Legacy Memory
+            count_old = 0; 
+            global_id_old = 1;
+            // Clear Defense Memory
+            count_new = 0; 
+            front = 0; 
+            rear = -1;
+            global_id_new = 1;
+            session_count = 0; // Clear rate limits
+            
+            // Clear Files
+            f1 = fopen(LOG_LEGACY, "w"); fprintf(f1, "[]"); fclose(f1);
+            f2 = fopen(LOG_DEFENSE, "w"); fprintf(f2, "[]"); fclose(f2);
+            printf("[ SYSTEM RESET ] All logs cleared.\n");
+        }
+
         // --- LEGACY ---
         if (check_and_read("cmd_legacy_normal.txt", ip)) {
             if (analyze_ip(ip, info)) { add_log_old(ip, 'G', "[ALLOW] Traffic Authorized"); save_logs_old(); }
