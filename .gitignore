@@ -1,0 +1,6 @@
+# Ignore data files so "Old Data" doesn't get uploaded
+*.json
+*.txt
+*.exe
+backend
+__pycache__/
