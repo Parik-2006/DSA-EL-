@@ -38,6 +38,11 @@
 </head>
 <body>
     <a href="/" class="back-btn">[ BACK ]</a>
+    
+    <button onclick="resetSystem()" style="position: absolute; top: 20px; right: 20px; background: #ff0000; border: 1px solid white; color: white; padding: 10px; cursor: pointer; font-family: monospace; font-weight: bold; z-index: 1000;">
+        ⚠️ RESET SYSTEM
+    </button>
+
     <h1>LEGACY PACKET INSPECTOR</h1>
 
     <div>
@@ -68,6 +73,19 @@
     </div>
 
     <script>
+        // --- NEW RESET FUNCTION ---
+        function resetSystem() {
+            if(confirm("Are you sure you want to wipe all logs and reset the system?")) {
+                fetch('/trigger_reset', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    alert("System Memory Cleared!");
+                    location.reload(); 
+                })
+                .catch(err => alert("Error resetting system"));
+            }
+        }
+
         function checkIPAndShowMessage() {
             const ip = document.getElementById('ipInput').value;
             const msgBox = document.getElementById('msgBox');
