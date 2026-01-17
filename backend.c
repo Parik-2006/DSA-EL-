@@ -1,8 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 #include <time.h> 
+
+// --- CROSS-PLATFORM COMPATIBILITY ---
+#ifdef _WIN32
+    #include <windows.h>
+    #define SLEEP_MS(ms) Sleep(ms)
+#else
+    #include <unistd.h>
+    #define SLEEP_MS(ms) usleep((ms) * 1000)
+#endif
 
 #define LOG_LEGACY "logs.json"
 #define LOG_DEFENSE "logs_defense.json"
@@ -173,7 +181,7 @@ int check_and_read(char *filename, char *buffer) {
 }
 
 int main() {
-    printf("[ SYSTEM ACTIVE ] Server Running on Port 5000\n");
+    printf("[ SYSTEM ACTIVE ] Rate Limit: 3 req / 10 sec\n");
     FILE *f1 = fopen(LOG_LEGACY, "w"); if(f1){fprintf(f1, "[]"); fclose(f1);}
     FILE *f2 = fopen(LOG_DEFENSE, "w"); if(f2){fprintf(f2, "[]"); fclose(f2);}
     
@@ -196,20 +204,14 @@ int main() {
         }
 
         // --- DEFENSE SYSTEM ---
-        
-        // 1. CHECK REQUEST
         if (check_and_read("cmd_defense_normal.txt", ip)) {
             if (analyze_ip(ip, info)) {
-                
-                // Priority 1: Is it in the Blocklist?
                 if (check_ip(root, ip)) {
                     add_log_new(ip, 'R', "[BLOCK] Blacklisted IP");
                 } 
-                // Priority 2: Is user spamming?
                 else if (!check_rate_limit(ip)) {
                     add_log_new(ip, 'R', "[DROP] Rate Limit Exceeded");
                 } 
-                // Priority 3: It's clean.
                 else {
                     add_log_new(ip, 'G', "[PASS] Access Granted");
                 }
@@ -217,7 +219,6 @@ int main() {
             }
         }
 
-        // 2. ATTACK SIMULATION
         if (check_and_read("cmd_defense_attack.txt", ip)) {
             if (analyze_ip(ip, info)) {
                 int blocked = check_ip(root, ip);
@@ -229,7 +230,7 @@ int main() {
             }
         }
 
-        Sleep(50);
+        SLEEP_MS(50); // Replaced Sleep() with Cross-Platform Macro
     }
     return 0;
 }
