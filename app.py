@@ -10,7 +10,7 @@ def home():
     blocked_ips = []
     if os.path.exists("blocked_ips.txt"):
         with open("blocked_ips.txt", "r") as f:
-            blocked_ips = [line.strip() for line in f.readlines() if line.strip()]
+            blocked_ips = [line.strip() for line in f.readlines() if line.strip() and not line.startswith("#")]
     return render_template("index.html", blocked_ips=blocked_ips)
 
 @app.route("/trigger", methods=["POST"])
@@ -26,19 +26,15 @@ def trigger():
 def data():
     stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
     logs = []
-    
     if os.path.exists("stats.json"):
         try:
             with open("stats.json", "r") as f: stats = json.load(f)
         except: pass
-
     if os.path.exists("simulation_logs.json"):
         try:
-            with open("simulation_logs.json", "r") as f: 
-                logs = json.load(f)
-            os.remove("simulation_logs.json") # Delete after read
+            with open("simulation_logs.json", "r") as f: logs = json.load(f)
+            os.remove("simulation_logs.json") 
         except: pass
-        
     return jsonify({"stats": stats, "logs": logs})
 
 @app.after_request
