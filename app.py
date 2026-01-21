@@ -7,7 +7,6 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 @app.route("/")
 def home():
-    # Read blocked IPs to show on screen
     blocked_ips = []
     if os.path.exists("blocked_ips.txt"):
         with open("blocked_ips.txt", "r") as f:
@@ -17,10 +16,9 @@ def home():
 @app.route("/trigger", methods=["POST"])
 def trigger():
     data = request.get_json(force=True)
-    mode = data.get("mode") # "NORMAL" or "ATTACK"
+    mode = data.get("mode")
     ip = data.get("ip")
-
-    # Write command for C backend
+    
     with open("cmd_trigger.txt", "w") as f:
         f.write(f"{mode} {ip}")
         f.flush()
@@ -33,14 +31,19 @@ def data():
     stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
     logs = []
     
+    # Read Stats (Persistent)
     if os.path.exists("stats.json"):
         try:
             with open("stats.json", "r") as f: stats = json.load(f)
         except: pass
 
+    # Read Logs (Transient - Read & Delete to avoid duplicates in UI)
     if os.path.exists("simulation_logs.json"):
         try:
-            with open("simulation_logs.json", "r") as f: logs = json.load(f)
+            with open("simulation_logs.json", "r") as f: 
+                logs = json.load(f)
+            # Important: Remove file so we don't send the same logs next poll
+            os.remove("simulation_logs.json")
         except: pass
         
     return jsonify({"stats": stats, "logs": logs})
