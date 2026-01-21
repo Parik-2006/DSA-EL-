@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 
-# 1. FORCE DELETE any existing data files from previous runs or Git
-echo "Cleaning up old logs..."
-rm -f logs.json
-rm -f logs_defense.json
-rm -f trie_view.json
-rm -f cmd_*.txt
-
-# 2. Start the C Backend in the background
-# We add './' to be safe and '&' to run it alongside Python
-echo "Starting Backend..."
+# 1. Run the C Backend in the background (& symbol does this)
+# We hide output to keep logs clean, or keep it for debugging
 ./backend &
 
-# 3. Start the Web Server
-echo "Starting Web Server..."
+# 2. Sleep for 1 second to ensure C engine is ready
+sleep 1
+
+# 3. Start the Python Web Server using Gunicorn
+# 'app:app' means look in 'app.py' for the 'app' object
 gunicorn app:app
