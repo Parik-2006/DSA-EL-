@@ -13,6 +13,7 @@
         p { color: #888; font-size: 14px; line-height: 1.5; }
         .red { color: #ff4444; }
         .blue { color: #0088ff; }
+        .green { color: #00ff88; font-size: 11px; border: 1px solid #00ff88; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -22,14 +23,18 @@
             <span class="icon">⚠️</span>
             <h2 class="red">Legacy System</h2>
             <p>Phase 1 Implementation</p>
-            <p>Uses Linear Search (O(N))<br>Basic Array Logging</p>
+            <p>Uses Linear Search (O(N))<br>Basic Array Logging<br>Vulnerable to Floods</p>
         </a>
 
         <a href="/defense" class="card" style="border-top: 4px solid #0088ff;">
             <span class="icon">🛡️</span>
             <h2 class="blue">Defense System</h2>
-            <p>Phase 2 Implementation</p>
-            <p>Uses Trie (O(1) Blocking)<br>Circular Queue Memory</p>
+            <p>Phase 2 & 3 (Final)</p>
+            <p>
+                Uses Bitwise Trie (O(1))<br>
+                Circular Queue Memory<br>
+                <span class="green">NEW: CIDR Subnet Blocking</span>
+            </p>
         </a>
     </div>
 </body>

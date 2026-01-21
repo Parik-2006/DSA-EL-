@@ -30,6 +30,7 @@
         button { padding: 15px 30px; font-size: 14px; cursor: pointer; border: 1px solid; border-radius: 3px; margin: 10px; color: white; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; background: transparent; }
         .btn-green { border-color: #00ff00; color: #00ff00; } .btn-green:hover { background: #00ff00; color: black; box-shadow: 0 0 15px #00ff00; }
         .btn-red { border-color: #ff3333; color: #ff3333; } .btn-red:hover { background: #ff3333; color: black; box-shadow: 0 0 15px #ff3333; }
+        .btn-cyan { border-color: #00aaff; color: #00aaff; } .btn-cyan:hover { background: #00aaff; color: black; box-shadow: 0 0 15px #00aaff; }
         
         .chart-container { height: 250px; width: 80%; margin: auto; background: #0a0a0a; padding: 15px; border: 1px solid #333; }
         .back-btn { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #666; border: 1px solid #333; padding: 5px 15px; }
@@ -57,6 +58,7 @@
     <div>
         <button class="btn-green" onclick="send('normal')">ANALYZE PACKET</button>
         <button class="btn-red" onclick="send('attack')">SIMULATE FLOOD</button>
+        <button class="btn-cyan" onclick="runBitwiseCheck()">ADVANCED CIDR CHECK 🚀</button>
     </div>
 
     <div class="chart-container"><canvas id="trafficChart"></canvas></div>
@@ -84,6 +86,25 @@
                 })
                 .catch(err => alert("Error resetting system"));
             }
+        }
+
+        // --- NEW BITWISE CIDR CHECK FUNCTION ---
+        function runBitwiseCheck() {
+            const isValid = checkIPAndShowMessage();
+            if (!isValid) return; 
+            
+            const ip = document.getElementById('ipInput').value || "0.0.0.0";
+            
+            // Note: We send this to the binary trigger, but the results will appear 
+            // in the Defense logs (history_new), not the Legacy logs (history_old).
+            // This is intentional to show the "Upgrade" result.
+            alert("Request sent to Dual Engine. Check Defense Logs for CIDR Result.");
+            
+            fetch('/trigger_binary', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ip: ip}) 
+            });
         }
 
         function checkIPAndShowMessage() {

@@ -70,6 +70,25 @@ def trigger_defense():
     return jsonify({"status": "sent"})
 
 
+# -------------------- BITWISE CIDR TRIGGER (NEW) --------------------
+
+@app.route("/trigger_binary", methods=["POST"])
+def trigger_binary():
+    data = request.get_json(force=True)
+    user_ip = data.get("ip", "0.0.0.0")
+
+    try:
+        # Writes the IP to a file that the C backend reads for the Bitwise Check
+        with open("cmd_binary_check.txt", "w") as f:
+            f.write(user_ip)
+            f.flush()
+            os.fsync(f.fileno())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"status": "sent"})
+
+
 # -------------------- LOGS & RULES --------------------
 
 @app.route("/logs")
@@ -105,15 +124,6 @@ def trie_rules():
         return jsonify([])
 
 
-# -------------------- NO-CACHE FIX --------------------
-
-@app.after_request
-def add_no_cache_headers(response):
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
-
 # -------------------- SYSTEM RESET --------------------
 
 @app.route("/trigger_reset", methods=["POST"])
@@ -128,6 +138,18 @@ def trigger_reset():
         return jsonify({"error": str(e)}), 500
     
     return jsonify({"status": "reset"})
+
+
+# -------------------- NO-CACHE FIX --------------------
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 # -------------------- SERVER START --------------------
 
 if __name__ == "__main__":
