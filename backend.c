@@ -17,38 +17,43 @@
 #define LOGS_FILE "simulation_logs.json"
 #define CMD_FILE "cmd_trigger.txt"
 
-// --- ALGORITHMS (Standard + Stride) ---
-// (Keeping these concise as the logic remains the same, focusing on the logging changes)
+// --- RATE LIMITER (Relaxed Rules) ---
+typedef struct { char ip[32]; int count; time_t first_req_time; } RateEntry;
+RateEntry sessions[200]; 
+int session_idx = 0;
 
-// 1. Array
+int check_rate_limit(char *ip) {
+    time_t now = time(NULL);
+    for(int i=0; i<200; i++) {
+        if(strcmp(sessions[i].ip, ip) == 0) {
+            if(difftime(now, sessions[i].first_req_time) <= 5.0) { // 5 Second Window
+                sessions[i].count++;
+                if(sessions[i].count > 10) return 0; // Allow 10 clicks before blocking
+                return 1;
+            } else {
+                sessions[i].first_req_time = now;
+                sessions[i].count = 1;
+                return 1;
+            }
+        }
+    }
+    strcpy(sessions[session_idx].ip, ip);
+    sessions[session_idx].count = 1;
+    sessions[session_idx].first_req_time = now;
+    session_idx = (session_idx + 1) % 200;
+    return 1;
+}
+
+// --- DATA STRUCTURES ---
 #define MAX_IPS 20000
 char *ip_array[MAX_IPS];
 int array_count = 0;
 void insert_array(char *ip) { if (array_count < MAX_IPS) ip_array[array_count++] = strdup(ip); }
-int check_array(char *ip) {
-    for (int i = 0; i < array_count; i++) { volatile int res = strcmp(ip_array[i], ip); if (res == 0) return 1; }
-    return 0;
-}
 
-// 2. String Trie
-typedef struct StringNode { struct StringNode *c[12]; int end; } StringNode;
-StringNode* newStringNode() { return (StringNode*)calloc(1, sizeof(StringNode)); }
-int getIdx(char c) { if (c == '.') return 10; if (c == '/') return 11; return c - '0'; }
-void insert_string(StringNode *root, char *ip) {
-    StringNode *curr = root;
-    for(int i=0; ip[i]; i++) {
-        if(ip[i] < '0' && ip[i] != '.' && ip[i] != '/') continue;
-        int idx = getIdx(ip[i]);
-        if(!curr->c[idx]) curr->c[idx] = newStringNode();
-        curr = curr->c[idx];
-    }
-    curr->end = 1;
-}
-
-// 3. Binary Trie
 typedef struct BinNode { struct BinNode *l, *r; int end; } BinNode;
 BinNode* newBinNode() { return (BinNode*)calloc(1, sizeof(BinNode)); }
 uint32_t ip2int(const char *ip) { unsigned int a,b,c,d; sscanf(ip, "%u.%u.%u.%u", &a,&b,&c,&d); return (a<<24)|(b<<16)|(c<<8)|d; }
+
 void insert_binary(BinNode *root, char *cidr) {
     char ip_str[32]; int prefix = 32; char *slash = strchr(cidr, '/');
     if(slash) { prefix = atoi(slash + 1); strncpy(ip_str, cidr, slash - cidr); ip_str[slash - cidr] = 0; } else strcpy(ip_str, cidr);
@@ -59,41 +64,18 @@ void insert_binary(BinNode *root, char *cidr) {
     }
     curr->end = 1;
 }
+
 int check_binary(BinNode *root, char *ip) {
     uint32_t val = ip2int(ip); BinNode *curr = root;
     for(int i=0; i<32; i++) { if(curr->end) return 1; int bit = (val >> (31-i)) & 1; curr = (bit==0) ? curr->l : curr->r; if(!curr) return 0; }
     return curr->end;
 }
 
-// 4. Stride-4 Engine
-typedef struct StrideNode { struct StrideNode *c[16]; int end; } StrideNode;
-StrideNode* newStrideNode() { return (StrideNode*)calloc(1, sizeof(StrideNode)); }
-void insert_stride(StrideNode *root, char *cidr) {
-    char ip_str[32]; int prefix = 32; char *slash = strchr(cidr, '/');
-    if(slash) { prefix = atoi(slash + 1); strncpy(ip_str, cidr, slash - cidr); ip_str[slash - cidr] = 0; } else strcpy(ip_str, cidr);
-    uint32_t val = ip2int(ip_str); StrideNode *curr = root;
-    for(int i=0; i<prefix; i+=4) {
-        int chunk = (val >> (28-i)) & 0xF;
-        if(!curr->c[chunk]) curr->c[chunk] = newStrideNode();
-        curr = curr->c[chunk];
-    }
-    curr->end = 1;
-}
-
-// --- UPDATED LOGGING (Batches) ---
-void write_logs(char *ip, char *type, int count) {
+// --- LOGGING ---
+void write_log(char *ip, char *status, char *desc, char *table) {
     FILE *f = fopen(LOGS_FILE, "w");
     if(!f) return;
-    fprintf(f, "[");
-    for(int i=0; i<count; i++) {
-        if(strcmp(type, "normal") == 0) {
-            fprintf(f, "{\"ip\": \"%s\", \"status\": \"ALLOWED\", \"latency\": \"0.05ms\", \"algo\": \"ALL OK\"}", ip);
-        } else {
-            fprintf(f, "{\"ip\": \"%s\", \"status\": \"BLOCKED\", \"latency\": \"CRITICAL\", \"algo\": \"STRIDE ENGINE CAUGHT\"}", ip);
-        }
-        if(i < count - 1) fprintf(f, ",");
-    }
-    fprintf(f, "]");
+    fprintf(f, "[{\"ip\": \"%s\", \"status\": \"%s\", \"desc\": \"%s\", \"table\": \"%s\"}]", ip, status, desc, table);
     fclose(f);
 }
 
@@ -103,18 +85,17 @@ void write_stats(double t1, double t2, double t3, double t4) {
 }
 
 int main() {
-    printf("[ SYSTEM ] Loading Engine...\n");
-    StringNode *str_root = newStringNode(); BinNode *bin_root = newBinNode(); StrideNode *stride_root = newStrideNode();
+    printf("[ SYSTEM ] Security Engine Online.\n");
+    BinNode *bin_root = newBinNode();
 
     FILE *f = fopen(BLOCKLIST_FILE, "r");
     char line[64];
     if(f) {
         while(fgets(line, sizeof(line), f)) {
             line[strcspn(line, "\r\n")] = 0; if(strlen(line)<7) continue;
-            insert_array(line); insert_string(str_root, line); insert_binary(bin_root, line); insert_stride(stride_root, line);
+            insert_binary(bin_root, line); insert_array(line);
         }
         fclose(f);
-        printf("[ SYSTEM ] Database Loaded.\n");
     }
 
     char cmd_buf[100], cmd[16], ip[32];
@@ -125,17 +106,30 @@ int main() {
                 sscanf(cmd_buf, "%s %s", cmd, ip);
                 fclose(cf); remove(CMD_FILE);
 
-                if(strcmp(cmd, "NORMAL") == 0) {
-                    // Normal = 1 Log Entry
-                    write_logs(ip, "normal", 1);
-                    write_stats(0.5, 0.4, 0.2, 0.05);
+                int is_blocked = check_binary(bin_root, ip);
+
+                // --- SEARCH COMMAND ---
+                if (strcmp(cmd, "SEARCH") == 0) {
+                    if (is_blocked) write_log(ip, "DANGER", "Found in Blocklist", "red");
+                    else write_log(ip, "SAFE", "Not in Database", "green");
                 }
-                else if(strcmp(cmd, "ATTACK") == 0) {
-                    printf("[ DDoS ] MITIGATING: %s\n", ip);
-                    int blocked = check_binary(bin_root, ip); 
-                    SLEEP_MS(1500); // Visual delay
-                    // Attack = 8 Log Entries (Flood)
-                    write_logs(ip, "attack", 8);
+                // --- NORMAL TRAFFIC ---
+                else if (strcmp(cmd, "NORMAL") == 0) {
+                    if (is_blocked) {
+                        write_log(ip, "BLOCKED", "Blacklisted IP", "red");
+                        write_stats(0.5, 0.4, 0.2, 0.05);
+                    } else if (check_rate_limit(ip)) {
+                        write_log(ip, "ALLOWED", "0.05ms", "green");
+                        write_stats(0.5, 0.4, 0.2, 0.05);
+                    } else {
+                        write_log(ip, "DENIED", "Rate Limit (>10/5s)", "red");
+                        write_stats(0.5, 0.4, 0.2, 0.05);
+                    }
+                }
+                // --- ATTACK SIMULATION ---
+                else if (strcmp(cmd, "ATTACK") == 0) {
+                    SLEEP_MS(1500); 
+                    write_log(ip, "MITIGATED", "Stride Engine Caught", "red");
                     write_stats(2500.0, 15.0, 2.0, 0.5); 
                 }
             } else { fclose(cf); }

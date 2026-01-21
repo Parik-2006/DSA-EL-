@@ -16,14 +16,10 @@ def home():
 @app.route("/trigger", methods=["POST"])
 def trigger():
     data = request.get_json(force=True)
-    mode = data.get("mode")
-    ip = data.get("ip")
-    
     with open("cmd_trigger.txt", "w") as f:
-        f.write(f"{mode} {ip}")
+        f.write(f"{data['mode']} {data['ip']}")
         f.flush()
         os.fsync(f.fileno())
-
     return jsonify({"status": "sent"})
 
 @app.route("/data")
@@ -31,19 +27,16 @@ def data():
     stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
     logs = []
     
-    # Read Stats (Persistent)
     if os.path.exists("stats.json"):
         try:
             with open("stats.json", "r") as f: stats = json.load(f)
         except: pass
 
-    # Read Logs (Transient - Read & Delete to avoid duplicates in UI)
     if os.path.exists("simulation_logs.json"):
         try:
             with open("simulation_logs.json", "r") as f: 
                 logs = json.load(f)
-            # Important: Remove file so we don't send the same logs next poll
-            os.remove("simulation_logs.json")
+            os.remove("simulation_logs.json") # Delete after read
         except: pass
         
     return jsonify({"stats": stats, "logs": logs})
