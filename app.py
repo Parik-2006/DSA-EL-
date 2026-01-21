@@ -1,158 +1,54 @@
 from flask import Flask, jsonify, render_template, request
 import json
 import os
-import logging
-
-# Silence Flask default logs
-log = logging.getLogger("werkzeug")
-log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
-
-# -------------------- ROUTES --------------------
-
 @app.route("/")
 def home():
-    return render_template("index.html")
+    # Read blocked IPs to show on screen
+    blocked_ips = []
+    if os.path.exists("blocked_ips.txt"):
+        with open("blocked_ips.txt", "r") as f:
+            blocked_ips = [line.strip() for line in f.readlines() if line.strip()]
+    return render_template("index.html", blocked_ips=blocked_ips)
 
-
-@app.route("/attack")
-def attack():
-    return render_template("dashboard.html")
-
-
-@app.route("/defense")
-def defense():
-    return render_template("defense.html")
-
-
-# -------------------- LEGACY TRIGGER --------------------
-
-@app.route("/trigger_legacy", methods=["POST"])
-def trigger_legacy():
+@app.route("/trigger", methods=["POST"])
+def trigger():
     data = request.get_json(force=True)
-    action = data.get("action", "normal")
-    user_ip = data.get("ip", "0.0.0.0")
+    mode = data.get("mode") # "NORMAL" or "ATTACK"
+    ip = data.get("ip")
 
-    filename = "cmd_legacy_normal.txt" if action == "normal" else "cmd_legacy_attack.txt"
-
-    try:
-        with open(filename, "w") as f:
-            f.write(user_ip)
-            f.flush()
-            os.fsync(f.fileno())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # Write command for C backend
+    with open("cmd_trigger.txt", "w") as f:
+        f.write(f"{mode} {ip}")
+        f.flush()
+        os.fsync(f.fileno())
 
     return jsonify({"status": "sent"})
 
-
-# -------------------- DEFENSE TRIGGER --------------------
-
-@app.route("/trigger_defense", methods=["POST"])
-def trigger_defense():
-    data = request.get_json(force=True)
-    action = data.get("action", "normal")
-    user_ip = data.get("ip", "0.0.0.0")
-
-    filename = "cmd_defense_normal.txt" if action == "normal" else "cmd_defense_attack.txt"
-
-    try:
-        with open(filename, "w") as f:
-            f.write(user_ip)
-            f.flush()
-            os.fsync(f.fileno())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    return jsonify({"status": "sent"})
-
-
-# -------------------- BITWISE CIDR TRIGGER (NEW) --------------------
-
-@app.route("/trigger_binary", methods=["POST"])
-def trigger_binary():
-    data = request.get_json(force=True)
-    user_ip = data.get("ip", "0.0.0.0")
-
-    try:
-        # Writes the IP to a file that the C backend reads for the Bitwise Check
-        with open("cmd_binary_check.txt", "w") as f:
-            f.write(user_ip)
-            f.flush()
-            os.fsync(f.fileno())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    return jsonify({"status": "sent"})
-
-
-# -------------------- LOGS & RULES --------------------
-
-@app.route("/logs")
-def logs_old():
-    try:
-        if os.path.exists("logs.json"):
-            with open("logs.json", "r") as f:
-                return jsonify(json.load(f))
-        return jsonify([])
-    except:
-        return jsonify([])
-
-
-@app.route("/logs_defense")
-def logs_new():
-    try:
-        if os.path.exists("logs_defense.json"):
-            with open("logs_defense.json", "r") as f:
-                return jsonify(json.load(f))
-        return jsonify([])
-    except:
-        return jsonify([])
-
-
-@app.route("/trie_rules")
-def trie_rules():
-    try:
-        if os.path.exists("trie_view.json"):
-            with open("trie_view.json", "r") as f:
-                return jsonify(json.load(f))
-        return jsonify([])
-    except:
-        return jsonify([])
-
-
-# -------------------- SYSTEM RESET --------------------
-
-@app.route("/trigger_reset", methods=["POST"])
-def trigger_reset():
-    try:
-        # Create the file that tells C backend to wipe memory
-        with open("cmd_reset.txt", "w") as f:
-            f.write("RESET")
-            f.flush()
-            os.fsync(f.fileno())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@app.route("/data")
+def data():
+    stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
+    logs = []
     
-    return jsonify({"status": "reset"})
+    if os.path.exists("stats.json"):
+        try:
+            with open("stats.json", "r") as f: stats = json.load(f)
+        except: pass
 
-
-# -------------------- NO-CACHE FIX --------------------
+    if os.path.exists("simulation_logs.json"):
+        try:
+            with open("simulation_logs.json", "r") as f: logs = json.load(f)
+        except: pass
+        
+    return jsonify({"stats": stats, "logs": logs})
 
 @app.after_request
-def add_no_cache_headers(response):
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
-
-
-# -------------------- SERVER START --------------------
+def add_header(r):
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return r
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    # Note: On Render, gunicorn handles the execution, not app.run()
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
