@@ -79,6 +79,8 @@
 <body>
 
     <button class="doc-btn" onclick="toggleDocs()">[ SYSTEM ARCHITECTURE ]</button>
+    
+    <button class="doc-btn" style="right: 280px;" onclick="toggleReference()">[ IP CLASS REFERENCE ]</button>
 
     <div id="docPanel" class="panel">
         <h2>PROJECT DOCUMENTATION</h2>
@@ -91,6 +93,46 @@
         - Real-time DDoS Simulation.<br>
         - Rate Limiting logic (>5 req/10s).<br>
         - CIDR Subnet Blocking (e.g. 10.0.0.0/8).</p>
+    </div>
+
+    <div id="referencePanel" class="panel" style="display: none; position: absolute; top: 70px; right: 280px; width: 450px;">
+        <h2 style="color: #fff; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;">IP CLASS REFERENCE</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: #050505;">
+            <tr style="border-bottom: 1px solid #333;">
+                <td style="padding: 8px; color: #888; font-weight: bold;">CLASS</td>
+                <td style="padding: 8px; color: #888; font-weight: bold;">OCTET 1 RANGE</td>
+                <td style="padding: 8px; color: #888; font-weight: bold;">STATUS</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #0a2a0a;">
+                <td style="padding: 8px; color: #00ff00; font-weight: bold;">Class A</td>
+                <td style="padding: 8px; color: #00ff00;">1 - 126</td>
+                <td style="padding: 8px; color: #00ff00;">✓ ALLOWED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #0a2a0a;">
+                <td style="padding: 8px; color: #00ff00; font-weight: bold;">Class B</td>
+                <td style="padding: 8px; color: #00ff00;">128 - 191</td>
+                <td style="padding: 8px; color: #00ff00;">✓ ALLOWED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #0a2a0a;">
+                <td style="padding: 8px; color: #00ff00; font-weight: bold;">Class C</td>
+                <td style="padding: 8px; color: #00ff00;">192 - 223</td>
+                <td style="padding: 8px; color: #00ff00;">✓ ALLOWED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #2a0a0a;">
+                <td style="padding: 8px; color: #ff3333; font-weight: bold;">Class D</td>
+                <td style="padding: 8px; color: #ff3333;">224 - 239</td>
+                <td style="padding: 8px; color: #ff3333;">✗ MULTICAST</td>
+            </tr>
+            <tr style="background: #2a0a0a;">
+                <td style="padding: 8px; color: #ff3333; font-weight: bold;">Class E</td>
+                <td style="padding: 8px; color: #ff3333;">240 - 255</td>
+                <td style="padding: 8px; color: #ff3333;">✗ EXPERIMENTAL</td>
+            </tr>
+        </table>
+        <p style="font-size: 11px; color: #999; margin-top: 15px; padding-top: 10px; border-top: 1px solid #333;">
+            <span style="color: #00ff00;">✓ Green Classes (A, B, C):</span> Standard unicast addresses. ALLOWED through firewall.<br>
+            <span style="color: #ff3333;">✗ Red Classes (D, E):</span> Reserved for special use. BLOCKED and logged as policy violation.
+        </p>
     </div>
 
     <h1>NEXT-GEN FIREWALL TECH SIMULATION</h1>
@@ -146,6 +188,11 @@
         // --- UI FUNCTIONS ---
         function toggleDocs() {
             const panel = document.getElementById('docPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function toggleReference() {
+            const panel = document.getElementById('referencePanel');
             panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
         }
 

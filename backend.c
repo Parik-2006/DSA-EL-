@@ -19,28 +19,84 @@
 #define CMD_FILE "cmd_trigger.txt"
 
 // ==========================================
-// 1. STRICT VALIDATION
+// 1. STRICT VALIDATION WITH IP CLASS DETECTION
 // ==========================================
-int validate_ip_format(const char *ip) {
+typedef struct { int valid; int class_id; char reason[64]; } IPValidation;
+
+// Parse IP and determine class (A=1, B=2, C=3, D=4, E=5)
+IPValidation validate_ip_strict(const char *ip) {
+    IPValidation result = {0, 0, ""};
     int dots = 0;
     int digits = 0;
+    
+    // Check format: only digits and dots
     for (int i = 0; ip[i]; i++) {
         if (ip[i] == '.') {
             dots++;
             digits = 0;
         } else if (isdigit(ip[i])) {
             digits++;
-            if (digits > 3) return 0; // Too many digits in octet
+            if (digits > 3) {
+                strcpy(result.reason, "Malformed Header");
+                return result; // Too many digits in octet
+            }
         } else {
-            return 0; // Invalid char
+            strcpy(result.reason, "Malformed Header");
+            return result; // Invalid char
         }
     }
-    if (dots != 3) return 0;
+    
+    if (dots != 3) {
+        strcpy(result.reason, "Malformed Header");
+        return result;
+    }
     
     unsigned int a, b, c, d;
-    if (sscanf(ip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4) return 0;
-    if (a > 255 || b > 255 || c > 255 || d > 255) return 0;
-    return 1;
+    if (sscanf(ip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4) {
+        strcpy(result.reason, "Malformed Header");
+        return result;
+    }
+    
+    if (a > 255 || b > 255 || c > 255 || d > 255) {
+        strcpy(result.reason, "Malformed Header");
+        return result;
+    }
+    
+    // Determine IP Class based on first octet
+    if (a >= 1 && a <= 126) {
+        result.class_id = 1; // Class A
+        result.valid = 1;
+    } else if (a >= 128 && a <= 191) {
+        result.class_id = 2; // Class B
+        result.valid = 1;
+    } else if (a >= 192 && a <= 223) {
+        result.class_id = 3; // Class C
+        result.valid = 1;
+    } else if (a >= 224 && a <= 239) {
+        result.class_id = 4; // Class D (Multicast)
+        strcpy(result.reason, "Multicast Reserved");
+        result.valid = 0;
+    } else if (a >= 240 && a <= 255) {
+        result.class_id = 5; // Class E (Experimental)
+        strcpy(result.reason, "Experimental Reserved");
+        result.valid = 0;
+    } else if (a == 0) {
+        result.class_id = 0; // Special (0.x.x.x)
+        strcpy(result.reason, "Malformed Header");
+        result.valid = 0;
+    } else if (a == 127) {
+        result.class_id = 0; // Loopback
+        strcpy(result.reason, "Loopback Reserved");
+        result.valid = 0;
+    }
+    
+    return result;
+}
+
+// Legacy function for backward compatibility
+int validate_ip_format(const char *ip) {
+    IPValidation val = validate_ip_strict(ip);
+    return val.valid;
 }
 
 // ==========================================
@@ -124,7 +180,7 @@ int check_binary(BinNode *root, char *ip) {
 }
 
 // ==========================================
-// 4. LOGGING
+// 4. LOGGING WITH CLASS VALIDATION
 // ==========================================
 void write_logs_batch(char *ip, char *type, int count) {
     FILE *f = fopen(LOGS_FILE, "w");
@@ -137,6 +193,9 @@ void write_logs_batch(char *ip, char *type, int count) {
         else if (strcmp(type, "sim_good") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"ALLOWED\", \"desc\": \"0.05ms\", \"table\": \"green\"}", ip);
         else if (strcmp(type, "sim_blocked") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"BLOCKED\", \"desc\": \"Blacklisted IP\", \"table\": \"red\"}", ip);
         else if (strcmp(type, "sim_ratelimit") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"DENIED\", \"desc\": \"Rate Limit (>5/10s)\", \"table\": \"red\"}", ip);
+        else if (strcmp(type, "class_d_reserved") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"DROPPED\", \"desc\": \"Multicast Reserved\", \"table\": \"red\"}", ip);
+        else if (strcmp(type, "class_e_reserved") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"DROPPED\", \"desc\": \"Experimental Reserved\", \"table\": \"red\"}", ip);
+        else if (strcmp(type, "malformed") == 0) fprintf(f, "{\"ip\": \"%s\", \"status\": \"DROPPED\", \"desc\": \"Malformed Header\", \"table\": \"red\"}", ip);
         else fprintf(f, "{\"ip\": \"%s\", \"status\": \"BLOCKED\", \"desc\": \"Stride Engine Caught\", \"table\": \"red\"}", ip);
         
         if(i < count - 1) fprintf(f, ",");
@@ -173,10 +232,23 @@ int main() {
                 if(sscanf(cmd_buf, "%s %s", cmd, ip) == 2) {
                     fclose(cf); remove(CMD_FILE);
 
-                    // VALIDATE IP FIRST
-                    if(!validate_ip_format(ip)) {
-                        // Ignore invalid IPs silently or log error
-                        continue; 
+                    // STRICT IP VALIDATION WITH CLASS CHECKING
+                    IPValidation ip_val = validate_ip_strict(ip);
+                    
+                    // Handle invalid/restricted IPs before further processing
+                    if (!ip_val.valid) {
+                        if (strcmp(ip_val.reason, "Multicast Reserved") == 0) {
+                            write_logs_batch(ip, "class_d_reserved", 1);
+                            write_stats(0.5, 0.4, 0.2, 0.05);
+                        } else if (strcmp(ip_val.reason, "Experimental Reserved") == 0) {
+                            write_logs_batch(ip, "class_e_reserved", 1);
+                            write_stats(0.5, 0.4, 0.2, 0.05);
+                        } else {
+                            // Malformed or other invalid format
+                            write_logs_batch(ip, "malformed", 1);
+                            write_stats(0.5, 0.4, 0.2, 0.05);
+                        }
+                        continue;
                     }
 
                     int is_blocked = check_binary(bin_root, ip);
