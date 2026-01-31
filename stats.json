@@ -1,1 +1,1 @@
-{"array": 2500.00, "string": 15.00, "binary": 2.00, "stride": 0.50}
+{"linear_search": 50.00, "string_match": 30.00, "binary_trie": 5.00, "stride_4": 1.00, "dhif_opt": 0.0010, "ip": "100.50.50.50", "valid": 0}

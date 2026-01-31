@@ -66,6 +66,37 @@
         .btn-util { border-color: #ffcc00; color: #ffcc00; } .btn-util:hover { background: #ffcc00; color: #000; }
         .chart-box { height: 300px; padding: 10px; background: #080808; border: 1px solid #222; }
 
+        /* PERFORMANCE DASHBOARD */
+        .performance-dashboard {
+            background: #080808; border: 1px solid #222; padding: 20px; margin-top: 20px; border-radius: 4px;
+        }
+        .dashboard-title {
+            color: #00ffcc; font-size: 14px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .algorithm-comparison {
+            margin-bottom: 18px;
+        }
+        .algo-label {
+            font-size: 12px; color: #ccc; margin-bottom: 5px; display: flex; justify-content: space-between;
+        }
+        .algo-label-name {
+            font-weight: bold;
+        }
+        .algo-label-ms {
+            color: #00ffcc; font-weight: bold;
+        }
+        .algo-bar-container {
+            background: #000; border: 1px solid #333; height: 20px; position: relative; overflow: hidden; border-radius: 2px;
+        }
+        .algo-bar {
+            height: 100%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 10px; transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .bar-linear { background: #ff3333; width: 0%; }      /* RED */
+        .bar-string { background: #ff9933; width: 0%; }      /* ORANGE */
+        .bar-binary { background: #ffcc00; width: 0%; }      /* YELLOW */
+        .bar-stride { background: #3399ff; width: 0%; }      /* BLUE */
+        .bar-dhif { background: #00ff00; width: 0%; }        /* NEON GREEN */
+
         /* TABLES */
         .tables-container { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
         .log-panel { width: 48%; height: 250px; display: flex; flex-direction: column; }
@@ -81,6 +112,8 @@
     <button class="doc-btn" onclick="toggleDocs()">[ SYSTEM ARCHITECTURE ]</button>
     
     <button class="doc-btn" style="right: 280px;" onclick="toggleReference()">[ IP CLASS REFERENCE ]</button>
+    
+    <button class="doc-btn" style="right: 580px;" onclick="toggleScenarios()">[ SIMULATION SCENARIOS ]</button>
 
     <div id="docPanel" class="panel">
         <h2>PROJECT DOCUMENTATION</h2>
@@ -135,6 +168,176 @@
         </p>
     </div>
 
+    <div id="scenariosPanel" class="panel" style="display: none; position: absolute; top: 70px; right: 580px; width: 650px; max-height: 600px; overflow-y: auto;">
+        <h2 style="color: #fff; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;">SIMULATION SCENARIOS (25 Test Cases)</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px; background: #050505;">
+            <tr style="border-bottom: 1px solid #333; background: #111;">
+                <td style="padding: 6px; color: #888; font-weight: bold;">CLASS</td>
+                <td style="padding: 6px; color: #888; font-weight: bold;">IP ADDRESS</td>
+                <td style="padding: 6px; color: #888; font-weight: bold;">SCENARIO NAME</td>
+                <td style="padding: 6px; color: #888; font-weight: bold;">STATUS</td>
+            </tr>
+            <!-- CLASS A EXAMPLES -->
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('10.0.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">A</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">10.0.0.1</td>
+                <td style="padding: 6px; color: #00ff00;">Corp Intranet</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('55.10.10.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">A</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">55.10.10.1</td>
+                <td style="padding: 6px; color: #00ff00;">Ext. Attacker</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('20.20.20.20')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">A</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">20.20.20.20</td>
+                <td style="padding: 6px; color: #00ff00;">Cloud Server</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('100.50.50.50')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">A</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">100.50.50.50</td>
+                <td style="padding: 6px; color: #00ff00;">Remote User</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('115.0.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">A</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">115.0.0.1</td>
+                <td style="padding: 6px; color: #00ff00;">ISP Gateway</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <!-- CLASS B EXAMPLES -->
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('172.16.0.5')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">B</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">172.16.0.5</td>
+                <td style="padding: 6px; color: #00ff00;">Campus Wi-Fi</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('150.50.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">B</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">150.50.1.1</td>
+                <td style="padding: 6px; color: #00ff00;">Lab Network</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('180.10.20.30')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">B</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">180.10.20.30</td>
+                <td style="padding: 6px; color: #00ff00;">Data Center</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('160.1.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">B</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">160.1.1.1</td>
+                <td style="padding: 6px; color: #00ff00;">Branch Office</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('130.5.5.5')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">B</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">130.5.5.5</td>
+                <td style="padding: 6px; color: #00ff00;">Regional Server</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <!-- CLASS C EXAMPLES -->
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('192.168.1.5')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">C</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">192.168.1.5</td>
+                <td style="padding: 6px; color: #00ff00;">Home User</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('192.168.0.100')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">C</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">192.168.0.100</td>
+                <td style="padding: 6px; color: #00ff00;">Admin PC</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('200.1.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">C</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">200.1.1.1</td>
+                <td style="padding: 6px; color: #00ff00;">IoT Device</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('210.10.10.10')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">C</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">210.10.10.10</td>
+                <td style="padding: 6px; color: #00ff00;">Guest Network</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #0a2a0a;" onclick="fillIP('220.5.5.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #00ff00;">C</td>
+                <td style="padding: 6px; color: #00ff00; font-weight: bold;">220.5.5.1</td>
+                <td style="padding: 6px; color: #00ff00;">Printer</td>
+                <td style="padding: 6px; color: #00ff00;">Valid</td>
+            </tr>
+            <!-- CLASS D EXAMPLES -->
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('224.0.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">D</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">224.0.0.1</td>
+                <td style="padding: 6px; color: #ff3333;">Video Stream</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('230.1.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">D</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">230.1.1.1</td>
+                <td style="padding: 6px; color: #ff3333;">OSPF Hello</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('239.255.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">D</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">239.255.0.1</td>
+                <td style="padding: 6px; color: #ff3333;">UPnP</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('225.5.5.5')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">D</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">225.5.5.5</td>
+                <td style="padding: 6px; color: #ff3333;">Conf Call</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('235.1.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">D</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">235.1.1.1</td>
+                <td style="padding: 6px; color: #ff3333;">Stock Feed</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <!-- CLASS E EXAMPLES -->
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('240.0.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">E</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">240.0.0.1</td>
+                <td style="padding: 6px; color: #ff3333;">Research Lab</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('250.50.50.50')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">E</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">250.50.50.50</td>
+                <td style="padding: 6px; color: #ff3333;">Future Use</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('255.255.255.255')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">E</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">255.255.255.255</td>
+                <td style="padding: 6px; color: #ff3333;">Broadcast</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #222; background: #2a0a0a;" onclick="fillIP('245.1.1.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">E</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">245.1.1.1</td>
+                <td style="padding: 6px; color: #ff3333;">Test Net</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+            <tr style="background: #2a0a0a;" onclick="fillIP('252.0.0.1')" style="cursor: pointer;">
+                <td style="padding: 6px; color: #ff3333;">E</td>
+                <td style="padding: 6px; color: #ff3333; font-weight: bold;">252.0.0.1</td>
+                <td style="padding: 6px; color: #ff3333;">Mil-Spec</td>
+                <td style="padding: 6px; color: #ff3333;">INVALID</td>
+            </tr>
+        </table>
+        <p style="font-size: 10px; color: #999; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
+            💡 Tip: Click any row to auto-fill the input field. Green = Valid traffic. Red = Reserved/Invalid class.
+        </p>
+    </div>
+
     <h1>NEXT-GEN FIREWALL TECH SIMULATION</h1>
 
     <div class="main-container">
@@ -163,6 +366,61 @@
                 <button class="btn-green" onclick="trigger('SIM_GOOD')">SIMULATE USER</button>
                 <button class="btn-red" onclick="trigger('SIM_BAD')">SIMULATE ATTACK</button>
                 <button class="btn-util" onclick="clearData()">CLEAR DATA</button>
+            </div>
+
+            <!-- PERFORMANCE COMPARISON DASHBOARD (5 ALGORITHMS) -->
+            <div class="performance-dashboard">
+                <div class="dashboard-title">⚡ 5-ALGORITHM EFFICIENCY COMPARISON</div>
+                
+                <div class="algorithm-comparison">
+                    <div class="algo-label">
+                        <span class="algo-label-name">🐢 Legacy Linear Search O(N)</span>
+                        <span class="algo-label-ms" id="linear-ms">0.00 ms</span>
+                    </div>
+                    <div class="algo-bar-container">
+                        <div class="algo-bar bar-linear" id="bar-linear"></div>
+                    </div>
+                </div>
+
+                <div class="algorithm-comparison">
+                    <div class="algo-label">
+                        <span class="algo-label-name">📊 String Matching O(L×N)</span>
+                        <span class="algo-label-ms" id="string-ms">0.00 ms</span>
+                    </div>
+                    <div class="algo-bar-container">
+                        <div class="algo-bar bar-string" id="bar-string"></div>
+                    </div>
+                </div>
+
+                <div class="algorithm-comparison">
+                    <div class="algo-label">
+                        <span class="algo-label-name">⚙️ Standard Binary Trie O(32)</span>
+                        <span class="algo-label-ms" id="binary-ms">0.00 ms</span>
+                    </div>
+                    <div class="algo-bar-container">
+                        <div class="algo-bar bar-binary" id="bar-binary"></div>
+                    </div>
+                </div>
+
+                <div class="algorithm-comparison">
+                    <div class="algo-label">
+                        <span class="algo-label-name">⚡ Stride-4 Radix Engine O(8)</span>
+                        <span class="algo-label-ms" id="stride-ms">0.00 ms</span>
+                    </div>
+                    <div class="algo-bar-container">
+                        <div class="algo-bar bar-stride" id="bar-stride"></div>
+                    </div>
+                </div>
+
+                <div class="algorithm-comparison">
+                    <div class="algo-label">
+                        <span class="algo-label-name">🚀 DHIF Optimization O(1)</span>
+                        <span class="algo-label-ms" id="dhif-ms">0.00 ms</span>
+                    </div>
+                    <div class="algo-bar-container">
+                        <div class="algo-bar bar-dhif" id="bar-dhif"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="chart-box">
@@ -194,6 +452,16 @@
         function toggleReference() {
             const panel = document.getElementById('referencePanel');
             panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function toggleScenarios() {
+            const panel = document.getElementById('scenariosPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function fillIP(ip) {
+            document.getElementById('trafficInput').value = ip;
+            document.getElementById('trafficInput').focus();
         }
 
         function clearData() {
@@ -272,10 +540,38 @@
                 polls++; if(polls > 6) clearInterval(interval);
                 
                 fetch('/data?t=' + Date.now()).then(r => r.json()).then(d => {
-                    if(d.stats.array > 0) {
-                        chart.data.datasets[0].data = [d.stats.array, d.stats.string, d.stats.binary, d.stats.stride];
-                        chart.update();
+                    // Update 5-algorithm performance dashboard with stats
+                    if(d.stats) {
+                        const maxLatency = Math.max(
+                            d.stats.linear_search || 50,
+                            d.stats.string_match || 30,
+                            d.stats.binary_trie || 5,
+                            d.stats.stride_4 || 1,
+                            d.stats.dhif_opt || 0.05,
+                            55
+                        );
+                        
+                        // Update bars (percentage of max latency)
+                        const linearPct = Math.min(100, ((d.stats.linear_search || 50) / maxLatency) * 100);
+                        const stringPct = Math.min(100, ((d.stats.string_match || 30) / maxLatency) * 100);
+                        const binaryPct = Math.min(100, ((d.stats.binary_trie || 5) / maxLatency) * 100);
+                        const stridePct = Math.min(100, ((d.stats.stride_4 || 1) / maxLatency) * 100);
+                        const dhifPct = Math.min(100, ((d.stats.dhif_opt || 0.05) / maxLatency) * 100);
+                        
+                        document.getElementById('bar-linear').style.width = linearPct + '%';
+                        document.getElementById('bar-string').style.width = stringPct + '%';
+                        document.getElementById('bar-binary').style.width = binaryPct + '%';
+                        document.getElementById('bar-stride').style.width = stridePct + '%';
+                        document.getElementById('bar-dhif').style.width = dhifPct + '%';
+                        
+                        // Update text labels
+                        document.getElementById('linear-ms').innerText = (d.stats.linear_search || 50).toFixed(2) + ' ms';
+                        document.getElementById('string-ms').innerText = (d.stats.string_match || 30).toFixed(2) + ' ms';
+                        document.getElementById('binary-ms').innerText = (d.stats.binary_trie || 5).toFixed(2) + ' ms';
+                        document.getElementById('stride-ms').innerText = (d.stats.stride_4 || 1).toFixed(2) + ' ms';
+                        document.getElementById('dhif-ms').innerText = (d.stats.dhif_opt || 0.05).toFixed(4) + ' ms';
                     }
+                    
                     if(Array.isArray(d.logs) && d.logs.length > 0) {
                         clearInterval(interval);
                         d.logs.forEach(l => {
