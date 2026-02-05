@@ -22,6 +22,13 @@ def trigger():
         os.fsync(f.fileno())
     return jsonify({"status": "sent"})
 
+@app.route("/blocked_ips")
+def blocked_ips_endpoint():
+    if os.path.exists("blocked_ips.txt"):
+        with open("blocked_ips.txt", "r") as f:
+            return f.read(), 200, {'Content-Type': 'text/plain'}
+    return "", 200, {'Content-Type': 'text/plain'}
+
 @app.route("/data")
 def data():
     stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
