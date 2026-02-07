@@ -1,1 +1,1 @@
-[{"ip":"attack","action":"dos","status":"REJECTED","reason":"Unauthorized Scenario"}]
+[{"ip":"dos","action":"fast","status":"REJECTED","reason":"Unauthorized Scenario"}]

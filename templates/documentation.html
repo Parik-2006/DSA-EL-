@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA-EL Documentation - Network Defense System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 150, 200, 0.05));
+            border-bottom: 2px solid #00d4ff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+        }
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #00e5ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            font-size: 16px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        .nav a { color: #00d4ff; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: all 0.3s ease; font-weight: 500; border: 1px solid transparent; }
+        .nav a:hover { background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45); transform: translateY(-2px); }
+        .nav a.home-btn { background: linear-gradient(135deg, #00d4ff, #00a8cc); color: #000; font-weight: 600; }
+        .nav a.home-btn:hover { background: linear-gradient(135deg, #00e5ff, #00b3d9); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45); transform: translateY(-2px); }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .section {
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.05), rgba(0, 100, 150, 0.03));
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .section h2 { color: #00d4ff; font-size: 28px; margin-bottom: 20px; border-bottom: 3px solid #00d4ff; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .section h3 { color: #b794f4; font-size: 20px; margin: 25px 0 15px; }
+        .section p, li { color: #d4d4d4; }
+        .code-block, .command { background: rgba(0, 0, 0, 0.4); border-left: 4px solid #00d4ff; padding: 15px 20px; margin: 15px 0; font-family: 'Courier New', monospace; overflow-x: auto; border-radius: 4px; }
+        .command { background: rgba(0, 0, 0, 0.6); color: #00ff88; padding: 12px 15px; border: 1px solid rgba(0, 255, 136, 0.2); display: block; }
+        .code-block { color: #00ff88; }
+        ul, ol { margin: 0 0 15px 25px; }
+        li { margin-bottom: 10px; }
+        li strong { color: #00d4ff; }
+        .info-box {
+            background: rgba(0, 212, 255, 0.08);
+            border-left: 4px solid #00d4ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .algorithm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .algorithm-table th,
+        .algorithm-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        .algorithm-table th {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.3), rgba(0, 180, 220, 0.2));
+            color: #00d4ff;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        .algorithm-table td {
+            color: #d4d4d4;
+        }
+        .algorithm-table tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+        .footer { background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(48, 43, 99, 0.9)); color: #b0b0b0; text-align: center; padding: 25px; margin-top: 50px; border-top: 2px solid #00d4ff; font-size: 16px; font-weight: 500; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DSA-EL Documentation</h1>
+        <p>Network Defense System - Technical Documentation</p>
+    </div>
+
+    <div class="nav">
+        <a href="/" class="home-btn">Back to Dashboard</a>
+        <a href="#getting-started">Getting Started</a>
+        <a href="#algorithm">Algorithm Details</a>
+    </div>
+
+    <div class="container">
+        <!-- GETTING STARTED -->
+        <div class="section" id="getting-started">
+            <h2>Getting Started</h2>
+            
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>Python 3.8 or higher</li>
+                <li>GCC compiler (for backend compilation)</li>
+                <li>Flask framework</li>
+                <li>Modern web browser (Chrome, Firefox, Edge)</li>
+            </ul>
+
+            <h3>Installation Steps</h3>
+            <ol>
+                <li>
+                    <strong>Clone the Repository</strong>
+                    <code class="command">git clone https://github.com/YOUR_USERNAME/DSA-EL-.git<br>cd DSA-EL-</code>
+                </li>
+                <li>
+                    <strong>Install Python Dependencies</strong>
+                    <code class="command">pip install -r requirements.txt</code>
+                </li>
+                <li>
+                    <strong>Compile the Backend (Optional)</strong>
+                    <code class="command">gcc backend.c -o backend.exe</code>
+                    <div class="info-box">
+                        <strong>Note:</strong> The C backend provides additional performance optimizations for the DHIF algorithm.
+                    </div>
+                </li>
+                <li>
+                    <strong>Run the Application</strong>
+                    <code class="command">python app.py</code>
+                </li>
+                <li>
+                    <strong>Access the Dashboard</strong>
+                    <p>Open your browser and navigate to: <code>http://localhost:5000</code></p>
+                </li>
+            </ol>
+
+            <h3>Quick Start Script</h3>
+            <p>You can also use the provided startup script:</p>
+            <code class="command">bash start.sh</code>
+        </div>
+
+        <!-- ALGORITHM DETAILS -->
+        <div class="section" id="algorithm">
+            <h2>Algorithm Details: DHIF (Dynamic Hash-Indexed Filter)</h2>
+            
+            <h3>Overview</h3>
+            <p>DHIF is our proprietary IP filtering algorithm designed for ultra-fast IP validation in network security systems. It combines hash-based indexing with stride optimization to achieve sub-millisecond lookup times.</p>
+
+            <h3>Algorithm Comparison</h3>
+            <table class="algorithm-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Time Complexity</th>
+                        <th>Space Complexity</th>
+                        <th>Avg. Search Time</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Linear Search</strong></td>
+                        <td>O(n)</td>
+                        <td>O(1)</td>
+                        <td>50-60ms</td>
+                        <td>Small datasets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>String Matching</strong></td>
+                        <td>O(n*m)</td>
+                        <td>O(1)</td>
+                        <td>30-35ms</td>
+                        <td>Pattern matching</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Binary Search</strong></td>
+                        <td>O(log n)</td>
+                        <td>O(1)</td>
+                        <td>5-6ms</td>
+                        <td>Sorted datasets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stride Search</strong></td>
+                        <td>O(n/k)</td>
+                        <td>O(1)</td>
+                        <td>1.5-2ms</td>
+                        <td>Medium datasets with optimization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DHIF (Ours)</strong></td>
+                        <td>O(1)</td>
+                        <td>O(n)</td>
+                        <td>0.04-0.06ms</td>
+                        <td>Real-time network security</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>How DHIF Works</h3>
+            <div class="code-block">
+<strong>Core Formula:</strong>
+
+1. Hash Function:
+   hash(IP) = (octet1 * 256³ + octet2 * 256² + octet3 * 256 + octet4) % TABLE_SIZE
+
+2. Index Calculation:
+   index = hash(IP) % STRIDE_SIZE
+
+3. Lookup:
+   if (hashTable[index].ip == targetIP)
+       return AUTHORIZED
+   else
+       return check_collision_chain()
+
+<strong>Key Features:</strong>
+- O(1) average case lookup time
+- Collision handling via chaining
+- Cache-friendly memory access patterns
+- Minimal memory overhead per IP entry
+</div>
+
+            <h3>DHIF Advantages</h3>
+            <ul>
+                <li><strong>Speed:</strong> 30-50x faster than binary search</li>
+                <li><strong>Scalability:</strong> Performance remains constant as IP list grows</li>
+                <li><strong>Memory Efficient:</strong> Uses hash table compression</li>
+                <li><strong>Real-Time Processing:</strong> Sub-millisecond response for DDoS mitigation</li>
+                <li><strong>Rate Limiting Integration:</strong> Built-in protection against abuse</li>
+            </ul>
+
+            <h3>Rate Limiting Protection</h3>
+            <p>DHIF includes intelligent rate limiting to prevent algorithmic degradation:</p>
+            <ul>
+                <li><strong>Limit:</strong> 3 authorization attempts per IP within 5 seconds</li>
+                <li><strong>Action:</strong> Automatic 30-second block on violation</li>
+                <li><strong>Purpose:</strong> Prevents automated abuse and DoS preparation</li>
+                <li><strong>Detection:</strong> Tracks timestamp-based patterns per IP</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 DSA-EL Network Defense System
+    </div>
+</body>
+</html>

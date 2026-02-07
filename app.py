@@ -13,13 +13,19 @@ def home():
             blocked_ips = [line.strip() for line in f.readlines() if line.strip() and not line.startswith("#")]
     return render_template("index.html", blocked_ips=blocked_ips)
 
+@app.route("/documentation")
+def documentation():
+    return render_template("documentation.html")
+
+@app.route("/references")
+def references():
+    return render_template("references.html")
+
 @app.route("/trigger", methods=["POST"])
 def trigger():
     data = request.get_json(force=True)
     with open("cmd_trigger.txt", "w") as f:
         f.write(f"{data['mode']} {data['ip']}")
-        f.flush()
-        os.fsync(f.fileno())
     return jsonify({"status": "sent"})
 
 @app.route("/blocked_ips")
@@ -33,15 +39,13 @@ def blocked_ips_endpoint():
 def data():
     stats = {"array": 0, "string": 0, "binary": 0, "stride": 0}
     logs = []
-    if os.path.exists("stats.json"):
-        try:
-            with open("stats.json", "r") as f: stats = json.load(f)
-        except: pass
-    if os.path.exists("simulation_logs.json"):
-        try:
-            with open("simulation_logs.json", "r") as f: logs = json.load(f)
-            os.remove("simulation_logs.json") 
-        except: pass
+    try:
+        if os.path.exists("stats.json"):
+            with open("stats.json") as f: stats = json.load(f)
+        if os.path.exists("simulation_logs.json"):
+            with open("simulation_logs.json") as f: logs = json.load(f)
+            os.remove("simulation_logs.json")
+    except: pass
     return jsonify({"stats": stats, "logs": logs})
 
 @app.after_request

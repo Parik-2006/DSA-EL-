@@ -4,113 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Next-Gen Network Defense System - 50 IP Command Center</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #e0e0e0; min-height: 100vh; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 340px; background: linear-gradient(180deg, rgba(48, 43, 99, 0.95), rgba(15, 12, 41, 0.98)); border-right: 2px solid #00d4ff; padding: 20px; overflow-y: auto; box-shadow: inset -2px 0 10px rgba(0, 212, 255, 0.1); }
-        .sidebar::-webkit-scrollbar { width: 8px; }
-        .sidebar::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 4px; }
-        .sidebar-header { font-size: 16px; font-weight: 600; color: #00d4ff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #00d4ff; padding-bottom: 10px; }
-        .class-section { margin-bottom: 15px; background: rgba(0, 212, 255, 0.05); border-left: 4px solid #00d4ff; border-radius: 4px; overflow: hidden; }
-        .class-header { background: linear-gradient(90deg, #00d4ff, #0099cc); color: #000; padding: 10px 12px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; text-transform: uppercase; user-select: none; transition: all 0.3s ease; }
-        .class-header:hover { background: linear-gradient(90deg, #00e5ff, #00b3d9); padding-left: 15px; }
-        .class-content { max-height: 350px; overflow: hidden; transition: max-height 0.3s ease; }
-        .class-content.collapsed { max-height: 0; }
-        .subsection-label { font-size: 10px; font-weight: 600; color: #00d4ff; padding: 8px 12px 3px; text-transform: uppercase; margin-top: 3px; }
-        .ip-button { width: calc(100% - 8px); margin: 3px 4px; padding: 8px 10px; background: rgba(0, 212, 255, 0.1); border: 1px solid #00d4ff; color: #e0e0e0; border-radius: 3px; cursor: pointer; font-size: 11px; transition: all 0.2s ease; text-align: left; font-family: 'Courier New', monospace; }
-        .ip-button:hover { background: rgba(0, 212, 255, 0.25); border-color: #00e5ff; box-shadow: 0 0 10px rgba(0, 212, 255, 0.3); transform: translateX(4px); }
-        .main-content { flex: 1; padding: 35px; display: flex; flex-direction: column; }
-        .header { text-align: center; margin-bottom: 35px; animation: fadeInDown 0.6s ease; }
-        .header h1 { font-size: 32px; margin-bottom: 8px; background: linear-gradient(90deg, #00d4ff, #00e5ff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; letter-spacing: 1px; }
-        .header p { color: #b0b0b0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
-        .control-panel { background: linear-gradient(180deg, rgba(0, 212, 255, 0.08), rgba(0, 100, 150, 0.05)); padding: 20px; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.3); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1); }
-        .input-group { display: flex; gap: 8px; margin-bottom: 15px; }
-        .input-group input { flex: 1; padding: 11px 13px; background: rgba(0, 0, 0, 0.3); border: 1px solid #00d4ff; border-radius: 4px; color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 13px; transition: all 0.3s ease; }
-        .input-group input:focus { outline: none; border-color: #00e5ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); background: rgba(0, 0, 0, 0.5); }
-        .button-group { display: flex; gap: 8px; }
-        .action-btn { padding: 10px 15px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; flex: 1; }
-        .authorize-btn { background: linear-gradient(135deg, #00d4ff, #00a8cc); color: #000; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); }
-        .authorize-btn:hover { box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5); transform: translateY(-2px); }
-        .dos-btn { background: linear-gradient(135deg, #ff7043, #d84315); color: #fff; box-shadow: 0 4px 15px rgba(255, 112, 67, 0.3); }
-        .dos-btn:hover { box-shadow: 0 6px 25px rgba(255, 112, 67, 0.5); transform: translateY(-2px); }
-        .ddos-btn { background: linear-gradient(135deg, #ff1744, #c41c3b); color: #fff; box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4); }
-        .ddos-btn:hover { box-shadow: 0 6px 25px rgba(255, 23, 68, 0.6); transform: translateY(-2px); }
-        .clear-btn { background: linear-gradient(135deg, #757575, #424242); color: #fff; box-shadow: 0 4px 15px rgba(117, 117, 117, 0.3); }
-        .clear-btn:hover { box-shadow: 0 6px 25px rgba(117, 117, 117, 0.5); transform: translateY(-2px); }
-        .algorithm-showcase { margin-bottom: 30px; animation: fadeInUp 0.7s ease; display: none; }
-        .algorithm-showcase.active { display: block; }
-        .showcase-title { font-size: 16px; font-weight: 700; color: #00d4ff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .progress-container { margin-bottom: 18px; display: flex; flex-direction: column; align-items: center; }
-        .progress-label { display: flex; justify-content: center; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 600; text-align: center; }
-        .progress-bar { width: 80px; height: 200px; background: rgba(0, 0, 0, 0.4); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 212, 255, 0.2); display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
-        .progress-fill { width: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; font-family: 'Courier New', monospace; transition: height 0.5s ease; position: relative; writing-mode: horizontal-tb; }
-        .progress-fill::after { content: attr(data-ms); position: absolute; font-size: 9px; font-weight: 600; color: #fff; }
-        .progress-legacy { background: linear-gradient(90deg, #ff4444, #cc0000); }
-        .progress-string { background: linear-gradient(90deg, #ff9800, #f57c00); }
-        .progress-binary { background: linear-gradient(90deg, #ffeb3b, #fbc02d); }
-        .progress-stride { background: linear-gradient(90deg, #2196f3, #1976d2); }
-        .progress-dhif { background: linear-gradient(90deg, #00ff88, #00cc66); box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
-        .dhif-badge { display: inline-block; background: linear-gradient(90deg, #00ff88, #00cc66); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 10px; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); } 50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); } }
-        .progress-legacy { background: linear-gradient(90deg, #ff4444, #cc0000); }
-        .progress-string { background: linear-gradient(90deg, #ff9800, #f57c00); }
-        .progress-binary { background: linear-gradient(90deg, #ffeb3b, #fbc02d); }
-        .progress-stride { background: linear-gradient(90deg, #2196f3, #1976d2); }
-        .progress-dhif { background: linear-gradient(90deg, #00ff88, #00cc66); box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
-        .data-section { display: flex; gap: 20px; animation: fadeInUp 0.8s ease; }
-        .data-title { font-size: 16px; font-weight: 700; color: #00d4ff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .table-container { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 4px; overflow: auto; max-height: 300px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        thead { background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 180, 220, 0.1)); }
-        th { padding: 12px; text-align: left; color: #00d4ff; font-weight: 700; border-bottom: 1px solid rgba(0, 212, 255, 0.3); text-transform: uppercase; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid rgba(0, 212, 255, 0.1); font-family: 'Courier New', monospace; }
-        tr:hover { background: rgba(0, 212, 255, 0.05); }
-        .status-authorized { color: #00ff88; font-weight: 600; }
-        .status-blocked { color: #ff4444; font-weight: 600; }
-        .status-invalid { color: #ffaa00; font-weight: 600; }
-        .status-blacklisted { color: #ff0000; font-weight: 700; }
-        .table-section { flex: 1; margin-top: 20px; }
-        .table-section.green .table-container { border: 2px solid #00ff88; }
-        .table-section.red .table-container { border: 2px solid #ff4444; }
-        .table-header-green { color: #00ff88; }
-        .table-header-red { color: #ff4444; }
-        .metrics-container { background: linear-gradient(180deg, rgba(0, 212, 255, 0.08), rgba(0, 100, 150, 0.05)); padding: 15px; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.3); margin-top: 15px; display: none; }
-        .metrics-container.active { display: block; }
-        .metric-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; border-bottom: 1px solid rgba(0, 212, 255, 0.1); }
-        .metric-label { color: #00d4ff; font-weight: 600; }
-        .metric-value { color: #ff4444; font-weight: 700; }
-        .metrics-title { color: #ff4444; font-weight: 700; margin-bottom: 10px; font-size: 14px; }
-        .metrics-title.dos { color: #ff7043; }
-        .metrics-title.ddos { color: #ff1744; }
-        .attack-ip-list { background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; margin: 10px 0 15px 0; border-left: 3px solid #ff4444; }
-        .attack-ip-list.dos { border-left-color: #ff7043; }
-        .attack-ip-list.ddos { border-left-color: #ff1744; }
-        .attacked-ips { color: #ffaaaa; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
     <div class="container">
         <!-- SIDEBAR: 50 IP SCENARIOS -->
         <div class="sidebar">
-            <div class="sidebar-header">📡 Command Center (50 IPs)</div>
+            <div class="sidebar-header">Command Center (50 IPs)</div>
 
             <!-- CLASS A -->
             <div class="class-section">
                 <div class="class-header" onclick="toggleClass(this)">
-                    <span>🔴 Class A (Large Network)</span>
-                    <span class="class-toggle">▼</span>
+                    <span>Class A (Large Network)</span>
+                    <span class="class-toggle">v</span>
                 </div>
                 <div class="class-content">
-                    <div class="subsection-label">🔒 Private/Local</div>
+                    <div class="subsection-label">Private/Local</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">10.0.0.1 (Gateway)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">10.5.5.5 (Intranet)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">10.1.1.100 (VPN User)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">10.255.0.1 (Database)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">10.10.10.10 (HR Server)</button>
-                    <div class="subsection-label">🌐 Public/Global</div>
+                    <div class="subsection-label">Public/Global</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">8.8.8.8 (Google DNS)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">1.1.1.1 (Cloudflare)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">55.10.10.1 (Attacker)</button>
@@ -122,17 +37,17 @@
             <!-- CLASS B -->
             <div class="class-section">
                 <div class="class-header" onclick="toggleClass(this)">
-                    <span>🟡 Class B (Medium Network)</span>
-                    <span class="class-toggle">▼</span>
+                    <span>Class B (Medium Network)</span>
+                    <span class="class-toggle">v</span>
                 </div>
                 <div class="class-content">
-                    <div class="subsection-label">🔒 Private/Local</div>
+                    <div class="subsection-label">Private/Local</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">172.16.0.10 (Campus Wi-Fi)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">172.17.5.5 (Lab PC)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">172.31.255.254 (Dorm Router)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">172.20.10.1 (Library)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">172.16.100.5 (Admin)</button>
-                    <div class="subsection-label">🌐 Public/Global</div>
+                    <div class="subsection-label">Public/Global</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">128.50.1.1 (Uni Partner)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">150.10.10.10 (External API)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">160.1.1.1 (Scanner)</button>
@@ -144,17 +59,17 @@
             <!-- CLASS C -->
             <div class="class-section">
                 <div class="class-header" onclick="toggleClass(this)">
-                    <span>🟢 Class C (Small Network)</span>
-                    <span class="class-toggle">▼</span>
+                    <span>Class C (Small Network)</span>
+                    <span class="class-toggle">v</span>
                 </div>
                 <div class="class-content">
-                    <div class="subsection-label">🔒 Private/Local</div>
+                    <div class="subsection-label">Private/Local</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">192.168.1.1 (Gateway)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">192.168.0.105 (Smart TV)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">192.168.1.50 (Laptop)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">192.168.10.10 (Printer)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">192.168.100.1 (Guest Net)</button>
-                    <div class="subsection-label">🌐 Public/Global</div>
+                    <div class="subsection-label">Public/Global</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">200.100.50.1 (Remote Worker)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">208.67.222.222 (OpenDNS)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">210.1.1.1 (Brute Force)</button>
@@ -166,17 +81,17 @@
             <!-- CLASS D: MULTICAST -->
             <div class="class-section">
                 <div class="class-header" onclick="toggleClass(this)">
-                    <span>🔵 Class D (Multicast)</span>
-                    <span class="class-toggle">▼</span>
+                    <span>Class D (Multicast)</span>
+                    <span class="class-toggle">v</span>
                 </div>
                 <div class="class-content">
-                    <div class="subsection-label">🎙️ Local Scope</div>
+                    <div class="subsection-label">Local Scope</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">224.0.0.1 (All Systems)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">224.0.0.5 (OSPF)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">224.0.0.251 (mDNS)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">224.0.0.18 (VRRP)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">224.0.0.22 (IGMP)</button>
-                    <div class="subsection-label">🌍 Global Scope</div>
+                    <div class="subsection-label">Global Scope</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">239.1.1.1 (Stream A)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">239.255.0.1 (SSDP)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">232.5.5.5 (Src Spec)</button>
@@ -188,17 +103,17 @@
             <!-- CLASS E: EXPERIMENTAL -->
             <div class="class-section">
                 <div class="class-header" onclick="toggleClass(this)">
-                    <span>🟣 Class E (Experimental)</span>
-                    <span class="class-toggle">▼</span>
+                    <span>Class E (Experimental)</span>
+                    <span class="class-toggle">v</span>
                 </div>
                 <div class="class-content">
-                    <div class="subsection-label">🔬 Range 1</div>
+                    <div class="subsection-label">Range 1</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">240.0.0.1 (Future Use)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">255.255.255.255 (Broadcast)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">250.1.1.1 (Mil-Test)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">245.0.0.5 (R&D)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">252.10.10.10 (Unassigned)</button>
-                    <div class="subsection-label">🔬 Range 2</div>
+                    <div class="subsection-label">Range 2</div>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">254.100.100.1 (Unassigned)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">248.5.5.5 (Unassigned)</button>
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">241.1.1.1 (Unassigned)</button>
@@ -206,13 +121,29 @@
                     <button class="ip-button" onclick="selectIP(this.textContent.split(' ')[0])">253.3.3.3 (Unassigned)</button>
                 </div>
             </div>
+
+            <!-- BLOCKED IPS SECTION -->
+            <div class="class-section">
+                <div class="class-header" onclick="toggleClass(this)" style="background: linear-gradient(90deg, #ff4444, #cc0000);">
+                    <span>BLOCKED IPs (blocked_ips.txt)</span>
+                    <span class="class-toggle">v</span>
+                </div>
+                <div class="class-content collapsed">
+                    <div class="subsection-label" style="color: #ff4444;">Pre-Blacklisted Database</div>
+                    <div id="blockedIPsList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Blocked IPs will be loaded here dynamically -->
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- MAIN CONTENT -->
         <div class="main-content">
+            <a href="/documentation" class="doc-btn">Documentation</a>
+            <a href="/references" class="ref-btn">References</a>
             <!-- HEADER -->
             <div class="header">
-                <h1>⚡ NETWORK DEFENSE COMMAND CENTER</h1>
+                <h1>NETWORK DEFENSE COMMAND CENTER</h1>
                 <p>Intelligent IP Management & 50 IP Strict Allowlist</p>
             </div>
 
@@ -222,17 +153,17 @@
                     <input type="text" id="ipInput" placeholder="Enter IP Address or Select from Sidebar..." onkeypress="handleKeyPress(event)">
                 </div>
                 <div class="button-group">
-                    <button class="action-btn authorize-btn" onclick="authorizeIP()">✓ Authorize</button>
-                    <button class="action-btn dos-btn" onclick="dosAttackIP()">🚨 DoS</button>
-                    <button class="action-btn ddos-btn" onclick="ddosAttackIP()">⚠️ DDoS</button>
-                    <button class="action-btn clear-btn" onclick="clearLog()">⟲ Clear</button>
+                    <button class="action-btn authorize-btn" onclick="authorizeIP()">Authorize</button>
+                    <button class="action-btn dos-btn" onclick="dosAttackIP()">DoS Attack</button>
+                    <button class="action-btn ddos-btn" onclick="ddosAttackIP()">DDoS Attack</button>
+                    <button class="action-btn clear-btn" onclick="clearLog()">Clear Log</button>
                 </div>
             </div>
 
             <!-- ALGORITHM COMPARISON -->
             <div class="algorithm-showcase">
-                <div class="showcase-title">📊 Algorithm Performance Comparison</div>
-                <div class="showcase-title" style="margin-top: 30px;">🚀 Data Structure Algorithm Comparison</div>
+                <div class="showcase-title">Algorithm Performance Comparison</div>
+                <div class="showcase-title" style="margin-top: 30px;">Data Structure Algorithm Comparison</div>
                 <div style="display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap;">
                     <div class="progress-container">
                         <div class="progress-label">
@@ -277,7 +208,7 @@
                         <div class="progress-bar">
                             <div id="dhif-bar" class="progress-fill" style="background: linear-gradient(180deg, #00ff88, #00cc66); box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); height: 0.1%;" data-ms="0.05 ms"></div>
                         </div>
-                        <div class="dhif-badge" style="margin-top: 8px; font-size: 9px; padding: 3px 8px;">⚡ 2x Hash</div>
+                        <div class="dhif-badge" style="margin-top: 8px; font-size: 9px; padding: 3px 8px;">2x Hash</div>
                     </div>
                 </div>
             </div>
@@ -309,7 +240,7 @@
 
                 <!-- RED TABLE: UNAUTHORIZED/BLOCKED -->
                 <div class="table-section red">
-                    <div class="data-title table-header-red">🚫 Unauthorized/Attacked IPs</div>
+                    <div class="data-title table-header-red">Unauthorized/Attacked IPs</div>
                     <div class="table-container">
                         <table>
                             <thead>
@@ -333,7 +264,7 @@
 
             <!-- ATTACK METRICS -->
             <div class="metrics-container" id="metricsContainer">
-                    <div class="metrics-title">🚨 Attack Impact Metrics</div>
+                    <div class="metrics-title">Attack Impact Metrics</div>
                     <div class="metric-item">
                         <span class="metric-label">Attack Packets/sec</span>
                         <span class="metric-value" id="metric-packets">0</span>
@@ -367,393 +298,14 @@
                         <span class="metric-value" id="metric-recovery">0s</span>
                     </div>
                 </div>
+            
+            <!-- FOOTER -->
+            <div class="footer">
+        &copy; 2026 DSA-EL Network Defense System
+    </div>
         </div>
     </div>
 
-    <script>
-        const validIPs = {
-            'A': ['10.0.0.1', '10.5.5.5', '10.1.1.100', '10.255.0.1', '10.10.10.10', '8.8.8.8', '1.1.1.1', '55.10.10.1', '100.20.30.40', '120.5.5.5'],
-            'B': ['172.16.0.10', '172.17.5.5', '172.31.255.254', '172.20.10.1', '172.16.100.5', '128.50.1.1', '150.10.10.10', '160.1.1.1', '180.50.50.50', '190.10.20.30'],
-            'C': ['192.168.1.1', '192.168.0.105', '192.168.1.50', '192.168.10.10', '192.168.100.1', '200.100.50.1', '208.67.222.222', '210.1.1.1', '220.50.10.1', '222.10.10.10'],
-            'D': ['224.0.0.1', '224.0.0.5', '224.0.0.251', '224.0.0.18', '224.0.0.22', '239.1.1.1', '239.255.0.1', '232.5.5.5', '233.1.1.1', '225.10.10.10'],
-            'E': ['240.0.0.1', '255.255.255.255', '250.1.1.1', '245.0.0.5', '252.10.10.10', '254.100.100.1', '248.5.5.5', '241.1.1.1', '242.2.2.2', '253.3.3.3']
-        };
-
-        // IP Descriptions Mapping
-        const ipDescriptions = {
-            // Class A
-            '10.0.0.1': 'Class A Private - Gateway',
-            '10.5.5.5': 'Class A Private - Intranet Server',
-            '10.1.1.100': 'Class A Private - VPN User',
-            '10.255.0.1': 'Class A Private - Database Server',
-            '10.10.10.10': 'Class A Private - HR Server',
-            '8.8.8.8': 'Class A Public - Google DNS (Valid)',
-            '1.1.1.1': 'Class A Public - Cloudflare DNS (Valid)',
-            '55.10.10.1': 'Class A Public - Suspected Attacker',
-            '100.20.30.40': 'Class A Public - Botnet Source',
-            '120.5.5.5': 'Class A Public - Spoofed IP',
-            // Class B
-            '172.16.0.10': 'Class B Private - Campus Wi-Fi',
-            '172.17.5.5': 'Class B Private - Lab PC',
-            '172.31.255.254': 'Class B Private - Dorm Router',
-            '172.20.10.1': 'Class B Private - Library Network',
-            '172.16.100.5': 'Class B Private - Admin Terminal',
-            '128.50.1.1': 'Class B Public - University Partner',
-            '150.10.10.10': 'Class B Public - External API',
-            '160.1.1.1': 'Class B Public - Port Scanner (Malicious)',
-            '180.50.50.50': 'Class B Public - SQL Injection Source',
-            '190.10.20.30': 'Class B Public - DDoS Zombie',
-            // Class C
-            '192.168.1.1': 'Class C Private - Home Gateway',
-            '192.168.0.105': 'Class C Private - Smart TV',
-            '192.168.1.50': 'Class C Private - Laptop',
-            '192.168.10.10': 'Class C Private - Printer',
-            '192.168.100.1': 'Class C Private - Guest Network',
-            '200.100.50.1': 'Class C Public - Remote Worker',
-            '208.67.222.222': 'Class C Public - OpenDNS',
-            '210.1.1.1': 'Class C Public - Brute Force Source',
-            '220.50.10.1': 'Class C Public - Spam Server',
-            '222.10.10.10': 'Class C Public - Unknown Origin',
-            // Class D
-            '224.0.0.1': 'Class D Multicast - All Systems (Local)',
-            '224.0.0.5': 'Class D Multicast - OSPF Protocol',
-            '224.0.0.251': 'Class D Multicast - mDNS',
-            '224.0.0.18': 'Class D Multicast - VRRP',
-            '224.0.0.22': 'Class D Multicast - IGMP',
-            '239.1.1.1': 'Class D Multicast - Stream A (Global)',
-            '239.255.0.1': 'Class D Multicast - SSDP',
-            '232.5.5.5': 'Class D Multicast - Source Specific',
-            '233.1.1.1': 'Class D Multicast - GLOP Addressing',
-            '225.10.10.10': 'Class D Multicast - Reserved',
-            // Class E
-            '240.0.0.1': 'Class E Experimental - Future Use',
-            '255.255.255.255': 'Class E Experimental - Limited Broadcast',
-            '250.1.1.1': 'Class E Experimental - Military Test',
-            '245.0.0.5': 'Class E Experimental - R&D Network',
-            '252.10.10.10': 'Class E Experimental - Unassigned',
-            '254.100.100.1': 'Class E Experimental - Unassigned',
-            '248.5.5.5': 'Class E Experimental - Unassigned',
-            '241.1.1.1': 'Class E Experimental - Unassigned',
-            '242.2.2.2': 'Class E Experimental - Unassigned',
-            '253.3.3.3': 'Class E Experimental - Unassigned'
-        };
-
-        // Blacklist storage
-        let blacklistedIPs = [];
-
-        // Load blacklist from server
-        fetch('/blocked_ips')
-            .then(res => res.text())
-            .then(data => {
-                blacklistedIPs = data.split('\n').map(ip => ip.trim()).filter(ip => ip.length > 0);
-            })
-            .catch(err => console.warn('Could not load blacklist:', err));
-
-        function getIPClass(ip) {
-            for (let cls in validIPs) {
-                if (validIPs[cls].includes(ip)) return cls;
-            }
-            return null;
-        }
-
-        function isValidIP(ip) {
-            return getIPClass(ip) !== null;
-        }
-
-        function getIPDescription(ip) {
-            return ipDescriptions[ip] || `Unknown IP - ${ip}`;
-        }
-
-        function isBlacklisted(ip) {
-            return blacklistedIPs.includes(ip);
-        }
-
-        function toggleClass(element) {
-            const content = element.nextElementSibling;
-            content.classList.toggle('collapsed');
-            const toggle = element.querySelector('.class-toggle');
-            toggle.style.transform = content.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
-        }
-
-        function selectIP(ip) {
-            document.getElementById('ipInput').value = ip;
-            document.getElementById('ipInput').focus();
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                authorizeIP();
-            }
-        }
-
-        function authorizeIP() {
-            const ip = document.getElementById('ipInput').value.trim();
-            if (!ip) {
-                alert('Please enter an IP address');
-                return;
-            }
-
-            if (!isValidIP(ip)) {
-                addLog(ip, 'Authorize', 'REJECTED', `Unauthorized: ${ip} - Not in 50 IP Allowlist`, false);
-                return;
-            }
-
-            const cls = getIPClass(ip);
-            const desc = getIPDescription(ip);
-            
-            // Check blacklist first
-            if (isBlacklisted(ip)) {
-                addLog(ip, 'Authorize', 'BLACKLISTED', `BLOCKED: ${desc} - Found in Blacklist Database`, false);
-                return;
-            }
-            
-            if (cls === 'D') {
-                addLog(ip, 'Authorize', 'INVALID', `Invalid: ${desc} - Multicast Reserved Range`, false);
-            } else if (cls === 'E') {
-                addLog(ip, 'Authorize', 'INVALID', `Invalid: ${desc} - Experimental/Future Use Range`, false);
-            } else {
-                addLog(ip, 'Authorize', 'AUTHORIZED', `Authorized: ${desc} - Access Granted`, true);
-                updateAlgorithmMetrics(false); // Normal performance
-            }
-        }
-
-        function updateAlgorithmMetrics(attackMode = false) {
-            // Update algorithm comparison with simulated timing
-            let linearTime, stringTime, binaryTime, strideTime, dhifTime;
-            
-            if (attackMode) {
-                // DoS/DDoS Attack - degraded performance (higher ms)
-                linearTime = (Math.random() * 150 + 200).toFixed(2);  // 200-350ms (4x slower)
-                stringTime = (Math.random() * 80 + 120).toFixed(2);   // 120-200ms (4x slower)
-                binaryTime = (Math.random() * 15 + 20).toFixed(2);    // 20-35ms (4x slower)
-                strideTime = (Math.random() * 3 + 5).toFixed(2);      // 5-8ms (5x slower)
-                dhifTime = (Math.random() * 0.2 + 0.3).toFixed(4);    // 0.3-0.5ms (8x slower)
-            } else {
-                // Normal operation - optimal performance
-                linearTime = (Math.random() * 10 + 45).toFixed(2);
-                stringTime = (Math.random() * 5 + 27).toFixed(2);
-                binaryTime = (Math.random() * 2 + 4).toFixed(2);
-                strideTime = (Math.random() * 0.5 + 0.8).toFixed(2);
-                dhifTime = (Math.random() * 0.04 + 0.03).toFixed(4);
-            }
-
-            // Update bar heights proportional to max (linear search)
-            const maxTime = parseFloat(linearTime);
-            
-            document.getElementById('linear-bar').style.height = '100%';
-            document.getElementById('linear-bar').setAttribute('data-ms', linearTime + ' ms');
-            
-            const stringHeight = (parseFloat(stringTime) / maxTime * 100).toFixed(1);
-            document.getElementById('string-bar').style.height = stringHeight + '%';
-            document.getElementById('string-bar').setAttribute('data-ms', stringTime + ' ms');
-            
-            const binaryHeight = (parseFloat(binaryTime) / maxTime * 100).toFixed(1);
-            document.getElementById('binary-bar').style.height = binaryHeight + '%';
-            document.getElementById('binary-bar').setAttribute('data-ms', binaryTime + ' ms');
-            
-            const strideHeight = (parseFloat(strideTime) / maxTime * 100).toFixed(1);
-            document.getElementById('stride-bar').style.height = Math.max(strideHeight, 2) + '%';
-            document.getElementById('stride-bar').setAttribute('data-ms', strideTime + ' ms');
-            
-            const dhifHeight = (parseFloat(dhifTime) / maxTime * 100).toFixed(2);
-            document.getElementById('dhif-bar').style.height = Math.max(dhifHeight, 1) + '%';
-            document.getElementById('dhif-bar').setAttribute('data-ms', dhifTime + ' ms');
-        }
-
-        function dosAttackIP() {
-            const ip = document.getElementById('ipInput').value.trim();
-            if (!ip) {
-                alert('Please enter an IP address');
-                return;
-            }
-
-            const cls = getIPClass(ip);
-            const desc = getIPDescription(ip);
-            
-            if (!isValidIP(ip)) {
-                addLog(ip, 'DoS Attack', 'INVALID', `Rejected: ${ip} - Not in Allowlist`, false);
-                return;
-            }
-
-            if (cls === 'D') {
-                addLog(ip, 'DoS Attack', 'INVALID', `Invalid: ${desc} - Cannot Attack Multicast Reserved`, false);
-                return;
-            } else if (cls === 'E') {
-                addLog(ip, 'DoS Attack', 'INVALID', `Invalid: ${desc} - Cannot Attack Experimental Range`, false);
-                return;
-            } else {
-                // Valid IP - launch DoS attack with SAME IP
-                addLog(ip, 'DoS Attack', 'DOS_ATTACK', `DoS Attack: ${desc} - Single Source Flood`, false);
-                updateAttackMetrics([ip], 'dos');
-                updateAlgorithmMetrics(true); // Degraded performance under attack
-            }
-        }
-
-        function ddosAttackIP() {
-            const ip = document.getElementById('ipInput').value.trim();
-            if (!ip) {
-                alert('Please enter an IP address');
-                return;
-            }
-
-            const desc = getIPDescription(ip);
-            
-            if (!isValidIP(ip)) {
-                addLog(ip, 'DDoS Attack', 'INVALID', `Rejected: ${ip} - Not in Allowlist`, false);
-                return;
-            }
-
-            // Generate 3-5 random IPs for DDoS
-            const allIPs = Object.values(validIPs).flat();
-            const randomCount = Math.floor(Math.random() * 3) + 3; // 3-5 random IPs
-            const randomIPs = [];
-            
-            for (let i = 0; i < randomCount; i++) {
-                randomIPs.push(allIPs[Math.floor(Math.random() * allIPs.length)]);
-            }
-
-            // Add log for target IP
-            addLog(ip, 'DDoS Attack', 'DDOS_ATTACK', `DDoS Target: ${desc} - ${randomIPs.length} Source Swarm`, false);
-            
-            // Add logs for random attack sources
-            for (let randomIP of randomIPs) {
-                const randomDesc = getIPDescription(randomIP);
-                addLog(randomIP, 'DDoS Source', 'DDOS_ATTACKED', `Attack Source: ${randomDesc} - Part of Botnet`, false);
-            }
-
-            updateAttackMetrics(randomIPs, 'ddos');
-            updateAlgorithmMetrics(true); // Degraded performance under attack
-        }
-
-        function updateAttackMetrics(ips, attackType) {
-            const metricsContainer = document.getElementById('metricsContainer');
-            const showcase = document.querySelector('.algorithm-showcase');
-            showcase.classList.add('active');
-            metricsContainer.classList.add('active');
-            
-            const metricsTitle = metricsContainer.querySelector('.metrics-title');
-            metricsTitle.className = 'metrics-title ' + attackType;
-            
-            if (attackType === 'dos') {
-                metricsTitle.innerHTML = `🚨 DoS Attack Impact - Target: ${ips[0]}`;
-            } else {
-                metricsTitle.innerHTML = `⚠️ DDoS Attack Impact - ${ips.length} Source IPs`;
-            }
-
-            // Update attack IP list
-            let ipListHTML = metricsContainer.querySelector('.attack-ip-list');
-            if (!ipListHTML) {
-                ipListHTML = document.createElement('div');
-                ipListHTML.className = 'attack-ip-list ' + attackType;
-                metricsContainer.insertBefore(ipListHTML, metricsContainer.querySelector('.metric-item'));
-            }
-            ipListHTML.className = 'attack-ip-list ' + attackType;
-            ipListHTML.innerHTML = `<div style="color: #00d4ff; font-weight: 600; margin-bottom: 5px;">Attacked IPs:</div><div class="attacked-ips">${ips.join(', ')}</div>`;
-            
-            // Update metrics container with 8 values
-            const multiplier = attackType === 'ddos' ? 3 : 1;
-            const metrics = {
-                packets: Math.floor(Math.random() * 500000 * multiplier) + 100000 * multiplier,
-                cpu: Math.floor(Math.random() * 40 * multiplier) + 60,
-                bandwidth: Math.floor(Math.random() * 800 * multiplier) + 200 * multiplier,
-                response: Math.floor(Math.random() * 5000 * multiplier) + 500 * multiplier,
-                clients: Math.floor(Math.random() * 800 * multiplier) + 200 * multiplier,
-                memory: Math.floor(Math.random() * 35) + 65,
-                latency: Math.floor(Math.random() * 500 * multiplier) + 100 * multiplier,
-                recovery: Math.floor(Math.random() * 120) + 30
-            };
-
-            document.getElementById('metric-packets').textContent = metrics.packets.toLocaleString();
-            document.getElementById('metric-cpu').textContent = Math.min(metrics.cpu, 100) + '%';
-            document.getElementById('metric-bandwidth').textContent = metrics.bandwidth;
-            document.getElementById('metric-response').textContent = metrics.response;
-            document.getElementById('metric-clients').textContent = metrics.clients;
-            document.getElementById('metric-memory').textContent = Math.min(metrics.memory, 100) + '%';
-            document.getElementById('metric-latency').textContent = metrics.latency;
-            document.getElementById('metric-recovery').textContent = metrics.recovery + 's';
-        }
-
-        function addLog(ip, action, status, reason, isAuthorized) {
-            const showcase = document.querySelector('.algorithm-showcase');
-            
-            // Show the algorithm showcase
-            showcase.classList.add('active');
-            
-            // Determine which table to use
-            let tbody;
-            if (isAuthorized === true && status === 'AUTHORIZED') {
-                tbody = document.getElementById('authorizedTableBody');
-                if (tbody.innerHTML.includes('No authorized')) {
-                    tbody.innerHTML = '';
-                }
-            } else {
-                tbody = document.getElementById('unauthorizedTableBody');
-                if (tbody.innerHTML.includes('No unauthorized')) {
-                    tbody.innerHTML = '';
-                }
-            }
-
-            const row = document.createElement('tr');
-            let statusClass = 'status-authorized';
-            if (status === 'BLOCKED' || status === 'DOS_ATTACK' || status === 'DDOS_ATTACK' || status === 'DDOS_ATTACKED') statusClass = 'status-blocked';
-            if (status === 'REJECTED' || status === 'INVALID') statusClass = 'status-invalid';
-            if (status === 'BLACKLISTED') statusClass = 'status-blacklisted';
-
-            fetch('/trigger', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    mode: action.toLowerCase(),
-                    ip: ip
-                })
-            });
-
-            // Calculate serial number from bottom (current count + 1)
-            const currentRows = tbody.querySelectorAll('tr').length;
-            const serialNumber = currentRows + 1;
-
-            row.innerHTML = `
-                <td>${serialNumber}</td>
-                <td>${ip}</td>
-                <td>${action}</td>
-                <td><span class="${statusClass}">${status}</span></td>
-                <td>${reason}</td>
-            `;
-            tbody.insertBefore(row, tbody.firstChild);
-            
-            // Update all serial numbers from bottom to top
-            const allRows = tbody.querySelectorAll('tr');
-            allRows.forEach((tr, index) => {
-                const slNoCell = tr.querySelector('td:first-child');
-                if (slNoCell) {
-                    slNoCell.textContent = allRows.length - index;
-                }
-            });
-        }
-
-        function clearLog() {
-            const showcase = document.querySelector('.algorithm-showcase');
-            showcase.classList.remove('active');
-            const metricsContainer = document.getElementById('metricsContainer');
-            metricsContainer.classList.remove('active');
-            
-            // Reset algorithm comparison metrics
-            document.getElementById('linear-bar').style.height = '100%';
-            document.getElementById('linear-bar').setAttribute('data-ms', '50.00 ms');
-            document.getElementById('string-bar').style.height = '60%';
-            document.getElementById('string-bar').setAttribute('data-ms', '30.00 ms');
-            document.getElementById('binary-bar').style.height = '10%';
-            document.getElementById('binary-bar').setAttribute('data-ms', '5.00 ms');
-            document.getElementById('stride-bar').style.height = '2%';
-            document.getElementById('stride-bar').setAttribute('data-ms', '1.00 ms');
-            document.getElementById('dhif-bar').style.height = '1%';
-            document.getElementById('dhif-bar').setAttribute('data-ms', '0.05 ms');
-            
-            document.getElementById('authorizedTableBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">No authorized entries yet.</td></tr>';
-            document.getElementById('unauthorizedTableBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">No unauthorized entries yet.</td></tr>';
-            document.getElementById('ipInput').value = '';
-        }
-
-    </script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>

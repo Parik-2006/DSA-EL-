@@ -5,12 +5,31 @@
 # build.sh
 # start.sh
 # blocked_ips.txt
+# README.md
 
 # --- IGNORE THESE (Do NOT upload) ---
+
+# Markdown documentation files (except README.md)
+*.md
+!README.md
+
+# Log and temporary files
 logs.json
 logs_defense.json
 trie_view.json
 cmd_*.txt
-*.exe          <-- Ignores Windows executables
-backend        <-- Ignores the Linux binary created during testing
+
+# Compiled files
+*.exe          # Ignores Windows executables
+backend        # Ignores the Linux binary created during testing
 __pycache__/
+*.pyc
+*.pyo
+
+# IDE and system files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
