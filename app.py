@@ -3,14 +3,35 @@ import json
 import os
 
 app = Flask(__name__)
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600
+
+BLOCKED_IPS_PATH = "blocked_ips.txt"
+_blocked_ips_cache = {"mtime": None, "data": []}
+
+
+def _load_blocked_ips():
+    try:
+        mtime = os.path.getmtime(BLOCKED_IPS_PATH)
+    except OSError:
+        _blocked_ips_cache["mtime"] = None
+        _blocked_ips_cache["data"] = []
+        return []
+
+    if _blocked_ips_cache["mtime"] != mtime:
+        with open(BLOCKED_IPS_PATH, "r") as f:
+            _blocked_ips_cache["data"] = [
+                line.strip()
+                for line in f.readlines()
+                if line.strip() and not line.startswith("#")
+            ]
+        _blocked_ips_cache["mtime"] = mtime
+
+    return _blocked_ips_cache["data"]
+
 
 @app.route("/")
 def home():
-    blocked_ips = []
-    if os.path.exists("blocked_ips.txt"):
-        with open("blocked_ips.txt", "r") as f:
-            blocked_ips = [line.strip() for line in f.readlines() if line.strip() and not line.startswith("#")]
+    blocked_ips = _load_blocked_ips()
     return render_template("index.html", blocked_ips=blocked_ips)
 
 @app.route("/documentation")
@@ -46,10 +67,8 @@ def trigger():
 
 @app.route("/blocked_ips")
 def blocked_ips_endpoint():
-    if os.path.exists("blocked_ips.txt"):
-        with open("blocked_ips.txt", "r") as f:
-            return f.read(), 200, {'Content-Type': 'text/plain'}
-    return "", 200, {'Content-Type': 'text/plain'}
+    blocked_ips = _load_blocked_ips()
+    return "\n".join(blocked_ips), 200, {'Content-Type': 'text/plain'}
 
 @app.route("/data")
 def data():
@@ -66,7 +85,10 @@ def data():
 
 @app.after_request
 def add_header(r):
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    if request.path.startswith("/static/"):
+        r.headers["Cache-Control"] = "public, max-age=604800, immutable"
+    else:
+        r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return r
 
 if __name__ == "__main__":
