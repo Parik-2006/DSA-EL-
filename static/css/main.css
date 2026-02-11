@@ -5,6 +5,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .sidebar::-webkit-scrollbar { width: 8px; }
 .sidebar::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 4px; }
 .sidebar-header { font-size: 16px; font-weight: 600; color: #00d4ff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #00d4ff; padding-bottom: 10px; }
+.sidebar-links { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.sidebar-link { text-decoration: none; text-align: center; padding: 10px 12px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #00141c; background: linear-gradient(135deg, #00d4ff, #00a8cc); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.sidebar-link:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45); }
 .class-section { margin-bottom: 15px; background: rgba(0, 212, 255, 0.05); border-left: 4px solid #00d4ff; border-radius: 4px; overflow: hidden; }
 .class-header { background: linear-gradient(90deg, #00d4ff, #0099cc); color: #000; padding: 10px 12px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; text-transform: uppercase; user-select: none; transition: all 0.3s ease; }
 .class-header:hover { background: linear-gradient(90deg, #00e5ff, #00b3d9); padding-left: 15px; }
@@ -36,20 +39,39 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .ddos-btn { background: linear-gradient(135deg, #ff1744, #c41c3b); color: #fff; }
 .clear-btn { background: linear-gradient(135deg, #757575, #424242); color: #fff; }
 .action-btn:hover { box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6); transform: translateY(-2px); opacity: 0.9; }
-.doc-btn, .ref-btn { position: absolute; top: 20px; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
-.doc-btn { right: 180px; background: rgba(0, 212, 255, 0.15); border: 2px solid #00d4ff; color: #00d4ff; }
-.ref-btn { right: 20px; background: rgba(138, 43, 226, 0.15); border: 2px solid #8a2be2; color: #b794f4; cursor: pointer; }
-.doc-btn:hover, .ref-btn:hover { transform: translateY(-2px); }
+.top-nav { position: absolute; top: 20px; right: 20px; display: flex; gap: 18px; align-items: center; }
+.doc-btn, .compare-btn, .hash-btn, .ref-btn { position: static; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+.doc-btn { background: rgba(0, 212, 255, 0.15); border: 2px solid #00d4ff; color: #00d4ff; }
+.compare-btn { background: rgba(0, 212, 255, 0.12); border: 2px solid #00bfe6; color: #7fe7ff; }
+.hash-btn { background: rgba(0, 255, 136, 0.12); border: 2px solid #00ff88; color: #7dffbf; }
+.ref-btn { background: rgba(138, 43, 226, 0.15); border: 2px solid #8a2be2; color: #b794f4; cursor: pointer; }
+.doc-btn:hover, .compare-btn:hover, .hash-btn:hover, .ref-btn:hover { transform: translateY(-2px); }
 .doc-btn:hover { background: #00d4ff; color: #000; }
+.compare-btn:hover { background: #00bfe6; color: #001219; }
+.hash-btn:hover { background: #00ff88; color: #00160c; }
 .ref-btn:hover { background: #8a2be2; color: #fff; }
 .algorithm-showcase { margin-bottom: 30px; animation: fadeInUp 0.7s ease; display: none; }
 .algorithm-showcase.active { display: block; }
 .showcase-title { font-size: 16px; font-weight: 700; color: #00d4ff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
 .progress-container { margin-bottom: 18px; display: flex; flex-direction: column; align-items: center; }
 .progress-label { display: flex; justify-content: center; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 600; text-align: center; }
-.progress-bar { width: 80px; height: 200px; background: rgba(0, 0, 0, 0.4); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 212, 255, 0.2); display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
-.progress-fill { width: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; font-family: 'Courier New', monospace; transition: height 0.5s ease; }
-.progress-fill::after { content: attr(data-ms); font-size: 9px; font-weight: 600; color: #fff; }
+.progress-bar { width: 80px; height: 210px; background: rgba(0, 0, 0, 0.35); border-radius: 6px; overflow: hidden; border: 1px solid rgba(0, 212, 255, 0.2); display: flex; flex-direction: column; justify-content: flex-end; position: relative; box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.45); }
+.progress-fill { width: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; font-family: 'Courier New', monospace; transition: height 0.5s ease; position: relative; }
+.progress-fill::after { content: attr(data-ms); font-size: 11px; font-weight: 700; color: currentColor; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85); background: transparent; padding: 0; border-radius: 0; display: inline-block; }
+.progress-value { margin-top: 8px; font-size: 13px; font-weight: 800; color: #e9f6ff; letter-spacing: 0.4px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); background: transparent; padding: 0; border-radius: 0; min-width: 96px; text-align: center; border: none; box-shadow: none; }
+.progress-value.dhif { color: #00ff88; text-shadow: 0 0 12px rgba(0, 255, 136, 0.85); }
+
+#linear-bar { color: #ffe3e3; }
+#string-bar { color: #fff1cc; }
+#binary-bar { color: #2b1b00; }
+#stride-bar { color: #dff1ff; }
+#dhif-bar { color: #00130a; }
+
+#linear-value { color: #ff9b9b; }
+#string-value { color: #ffd391; }
+#binary-value { color: #ffe76a; }
+#stride-value { color: #7fc7ff; }
+#dhif-value { color: #00ff88; }
 .progress-legacy { background: linear-gradient(90deg, #ff4444, #cc0000); }
 .progress-string { background: linear-gradient(90deg, #ff9800, #f57c00); }
 .progress-binary { background: linear-gradient(90deg, #ffeb3b, #fbc02d); }

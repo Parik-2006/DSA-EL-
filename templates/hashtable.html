@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Table Classification - DSA-EL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 150, 200, 0.05));
+            border-bottom: 2px solid #00d4ff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+        }
+        .header h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #00e5ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            font-size: 14px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        .nav a { color: #00d4ff; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: all 0.3s ease; font-weight: 500; border: 1px solid transparent; }
+        .nav a:hover { background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45); transform: translateY(-2px); }
+        .nav a.home-btn { background: linear-gradient(135deg, #00d4ff, #00a8cc); color: #000; font-weight: 600; }
+        .nav a.home-btn:hover { background: linear-gradient(135deg, #00e5ff, #00b3d9); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section {
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.05), rgba(0, 100, 150, 0.03));
+            padding: 26px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .section h2 { color: #00d4ff; font-size: 22px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .section p { color: #d4d4d4; margin-bottom: 12px; }
+        .list { margin: 12px 0 0 18px; }
+        .list li { margin-bottom: 8px; color: #d4d4d4; }
+        .highlight { color: #00ff88; font-weight: 700; }
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid #00d4ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border-radius: 4px;
+            color: #00ff88;
+        }
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+        }
+        .table-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .table-title {
+            color: #00d4ff;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+            text-align: left;
+        }
+        .table-card table th:nth-child(3),
+        .table-card table td:nth-child(3) {
+            text-align: center;
+        }
+        th {
+            color: #00d4ff;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.7px;
+        }
+        td.status { color: #00ff88; font-weight: 700; text-align: center; }
+        .footer { background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(48, 43, 99, 0.9)); color: #b0b0b0; text-align: center; padding: 22px; margin-top: 30px; border-top: 2px solid #00d4ff; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Hash Table Classification</h1>
+        <p>DHIF-Cuckoo Unified Table View</p>
+    </div>
+
+    <div class="nav">
+        <a href="/" class="home-btn">Back to Dashboard</a>
+        <a href="/documentation">Documentation</a>
+        <a href="/comparision">Algorithm Comparison</a>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Unified Cuckoo Hash Table</h2>
+            <p>The Unified Cuckoo Hash Map acts as the high-speed central nervous system of the firewall, consolidating all security rules into a singular, deterministic memory structure. By utilizing the Dual-Hash Integer-Fold (DHIF) engine, the system eliminates fragmented lookup lists and replaces them with two synchronized tables (table1 and table2) where every known IP friend or foe is mapped to a specific memory slot for instant O(1) verification. Each entry contains an optimized 32-bit integer key and a status code that dictates the firewall's action in a single clock cycle.</p>
+            <ul class="list">
+                <li><strong>Authorized IPs:</strong> 50 hardcoded IPs (Class A-E), stored with status <span class="highlight">1 (AUTHORIZED)</span>. Packets matching these entries are forwarded instantly with zero additional latency.</li>
+                <li><strong>Blocked IPs:</strong> 25 reputation-based IPs loaded from blocked_ips.txt, stored with status <span class="highlight">0 (BLOCKED)</span>. These packets are dropped at the ingress point.</li>
+                <li><strong>DoS Attack IPs:</strong> 25 dedicated simulation IPs, stored with status <span class="highlight">2 (DOS_ATTACK)</span>. Identification triggers an immediate packet drop and a high-priority red alert on the dashboard.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Table1 + Table2 (Authorized = 1)</h2>
+            <p>Below is a direct view of authorized IPs stored with status <span class="highlight">1 (AUTHORIZED)</span>. Only the six requested IPs are shown in table2, and all remaining authorized IPs are listed under table1.</p>
+            <div class="table-grid">
+                <div class="table-card">
+                    <div class="table-title">table1 (Authorized)</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>10.1.1.100</td><td class="status">1</td></tr>
+                            <tr><td>2</td><td>10.255.0.1</td><td class="status">1</td></tr>
+                            <tr><td>3</td><td>10.10.10.10</td><td class="status">1</td></tr>
+                            <tr><td>4</td><td>8.8.8.8</td><td class="status">1</td></tr>
+                            <tr><td>5</td><td>1.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>6</td><td>55.10.10.1</td><td class="status">1</td></tr>
+                            <tr><td>7</td><td>100.20.30.40</td><td class="status">1</td></tr>
+                            <tr><td>8</td><td>120.5.5.5</td><td class="status">1</td></tr>
+                            <tr><td>9</td><td>172.16.0.10</td><td class="status">1</td></tr>
+                            <tr><td>10</td><td>172.17.5.5</td><td class="status">1</td></tr>
+                            <tr><td>11</td><td>172.20.10.1</td><td class="status">1</td></tr>
+                            <tr><td>12</td><td>172.16.100.5</td><td class="status">1</td></tr>
+                            <tr><td>13</td><td>128.50.1.1</td><td class="status">1</td></tr>
+                            <tr><td>14</td><td>150.10.10.10</td><td class="status">1</td></tr>
+                            <tr><td>15</td><td>160.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>16</td><td>180.50.50.50</td><td class="status">1</td></tr>
+                            <tr><td>17</td><td>190.10.20.30</td><td class="status">1</td></tr>
+                            <tr><td>18</td><td>192.168.1.1</td><td class="status">1</td></tr>
+                            <tr><td>19</td><td>192.168.1.50</td><td class="status">1</td></tr>
+                            <tr><td>20</td><td>192.168.10.10</td><td class="status">1</td></tr>
+                            <tr><td>21</td><td>192.168.100.1</td><td class="status">1</td></tr>
+                            <tr><td>22</td><td>200.100.50.1</td><td class="status">1</td></tr>
+                            <tr><td>23</td><td>208.67.222.222</td><td class="status">1</td></tr>
+                            <tr><td>24</td><td>210.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>25</td><td>220.50.10.1</td><td class="status">1</td></tr>
+                            <tr><td>26</td><td>222.10.10.10</td><td class="status">1</td></tr>
+                            <tr><td>27</td><td>224.0.0.1</td><td class="status">1</td></tr>
+                            <tr><td>28</td><td>224.0.0.5</td><td class="status">1</td></tr>
+                            <tr><td>29</td><td>224.0.0.251</td><td class="status">1</td></tr>
+                            <tr><td>30</td><td>224.0.0.18</td><td class="status">1</td></tr>
+                            <tr><td>31</td><td>224.0.0.22</td><td class="status">1</td></tr>
+                            <tr><td>32</td><td>239.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>33</td><td>239.255.0.1</td><td class="status">1</td></tr>
+                            <tr><td>34</td><td>232.5.5.5</td><td class="status">1</td></tr>
+                            <tr><td>35</td><td>233.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>36</td><td>225.10.10.10</td><td class="status">1</td></tr>
+                            <tr><td>37</td><td>240.0.0.1</td><td class="status">1</td></tr>
+                            <tr><td>38</td><td>250.1.1.1</td><td class="status">1</td></tr>
+                            <tr><td>39</td><td>245.0.0.5</td><td class="status">1</td></tr>
+                            <tr><td>40</td><td>252.10.10.10</td><td class="status">1</td></tr>
+                            <tr><td>41</td><td>254.100.100.1</td><td class="status">1</td></tr>
+                            <tr><td>42</td><td>248.5.5.5</td><td class="status">1</td></tr>
+                            <tr><td>43</td><td>242.2.2.2</td><td class="status">1</td></tr>
+                            <tr><td>44</td><td>253.3.3.3</td><td class="status">1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-card">
+                    <div class="table-title">table2 (Authorized)</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>10.0.0.1</td><td class="status">1</td></tr>
+                            <tr><td>2</td><td>10.5.5.5</td><td class="status">1</td></tr>
+                            <tr><td>3</td><td>172.31.255.254</td><td class="status">1</td></tr>
+                            <tr><td>4</td><td>192.168.0.105</td><td class="status">1</td></tr>
+                            <tr><td>5</td><td>255.255.255.255</td><td class="status">1</td></tr>
+                            <tr><td>6</td><td>241.1.1.1</td><td class="status">1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Why This Is Real Protection</h2>
+            <ul class="list">
+                <li><strong>Speed:</strong> The same O(1) time for authorized or blocked lookups.</li>
+                <li><strong>Accuracy:</strong> Integer-only comparison means no false positives.</li>
+                <li><strong>Efficiency:</strong> One lookup decides if traffic is safe, malicious, or DoS-related.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Unlisted IPs</h2>
+            <p>If an IP is not found in either cuckoo table, the lookup returns <strong>Not Found</strong>. In a secure firewall, the default action is to block or drop the traffic so only known-good users get through.</p>
+            <div class="code-block">If not found: DROP (default deny)</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 DSA-EL Network Defense System
+    </div>
+</body>
+</html>

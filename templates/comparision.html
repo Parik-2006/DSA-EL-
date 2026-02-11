@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Comparison - DSA-EL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 150, 200, 0.05));
+            border-bottom: 2px solid #00d4ff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+        }
+        .header h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #00e5ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            font-size: 14px;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        .nav a { color: #00d4ff; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: all 0.3s ease; font-weight: 500; border: 1px solid transparent; }
+        .nav a:hover { background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45); transform: translateY(-2px); }
+        .nav a.home-btn { background: linear-gradient(135deg, #00d4ff, #00a8cc); color: #000; font-weight: 600; }
+        .nav a.home-btn:hover { background: linear-gradient(135deg, #00e5ff, #00b3d9); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section {
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.05), rgba(0, 100, 150, 0.03));
+            padding: 26px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .section h2 { color: #00d4ff; font-size: 22px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .algo {
+            border-left: 4px solid #00d4ff;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 6px;
+        }
+        .algo h3 { color: #b794f4; font-size: 18px; margin-bottom: 6px; }
+        .algo p { color: #d4d4d4; }
+        .label { color: #00d4ff; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.8px; }
+        .footer { background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(48, 43, 99, 0.9)); color: #b0b0b0; text-align: center; padding: 22px; margin-top: 30px; border-top: 2px solid #00d4ff; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Algorithm Comparison</h1>
+        <p>Legacy vs Modern Data Structures</p>
+    </div>
+
+    <div class="nav">
+        <a href="/" class="home-btn">Back to Dashboard</a>
+        <a href="/documentation">Documentation</a>
+        <a href="/hashtable">Hash Table</a>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Algorithms Used in This System</h2>
+
+            <div class="algo">
+                <div class="label">Legacy Array (Linear Search)</div>
+                <h3>O(n) Sequential Scan</h3>
+                <p>Checks each IP entry one-by-one. Simple but slow as the list grows.</p>
+                <p><strong>Real-World Use:</strong> Small ACLs, low-volume IoT allowlists, or temporary filters.</p>
+            </div>
+
+            <div class="algo">
+                <div class="label">String Trie</div>
+                <h3>O(L) String Prefix Walk</h3>
+                <p>Traverses nodes per character. Efficient for prefix matching but memory heavy.</p>
+                <p><strong>Real-World Use:</strong> DNS auto-complete, URL routing, and prefix-based filtering.</p>
+            </div>
+
+            <div class="algo">
+                <div class="label">Binary Trie</div>
+                <h3>O(32) Bitwise Traversal</h3>
+                <p>Walks one bit at a time through a binary tree of IPs.</p>
+                <p><strong>Real-World Use:</strong> Router lookups, IP routing tables, and firewall rule trees.</p>
+            </div>
+
+            <div class="algo">
+                <div class="label">Stride-4 Trie</div>
+                <h3>O(8) Stride-Based Traversal</h3>
+                <p>Moves 4 bits per step to reduce lookup depth.</p>
+                <p><strong>Real-World Use:</strong> High-speed routers, TCAM-like software indices, CEF-inspired routing.</p>
+            </div>
+
+            <div class="algo">
+                <div class="label">DHIF-Cuckoo (Dual-Hash Integer-Fold)</div>
+                <h3>O(1) Dual-Hash Cuckoo Lookup</h3>
+                <p>Each IP has two deterministic positions. Lookups check two slots only.</p>
+                <p><strong>Real-World Use:</strong> Modern firewalls, DDoS mitigation pipelines, and fast access control.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 DSA-EL Network Defense System
+    </div>
+</body>
+</html>

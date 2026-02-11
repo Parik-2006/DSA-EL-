@@ -59,6 +59,16 @@ const ipDescriptions = {
     '253.3.3.3': 'Class E Experimental - Unassigned'
 };
 
+const dosSimulationIPs = new Set([
+    '10.99.1.1', '10.99.1.2', '10.99.1.3', '10.99.1.4', '10.99.1.5',
+    '172.16.88.1', '172.16.88.2', '172.16.88.3', '172.16.88.4', '172.16.88.5',
+    '192.168.77.1', '192.168.77.2', '192.168.77.3', '192.168.77.4', '192.168.77.5',
+    '224.0.0.50', '224.0.0.51', '224.0.0.52', '224.0.0.53', '224.0.0.54',
+    '240.0.0.70', '240.0.0.71', '240.0.0.72', '240.0.0.73', '240.0.0.74'
+]);
+
+let lastBackendKey = null;
+
 let blacklistedIPs = [];
 
 const RATE_LIMIT_CONFIG = {
@@ -170,6 +180,10 @@ function isBlacklisted(ip) {
     return blacklistedIPs.includes(ip);
 }
 
+function isDoSSimulationIP(ip) {
+    return dosSimulationIPs.has(ip);
+}
+
 function toggleClass(element) {
     const content = element.nextElementSibling;
     content.classList.toggle('collapsed');
@@ -240,24 +254,23 @@ function updateAlgorithmMetrics(attackMode = false) {
     }
 
     const maxTime = parseFloat(linearTime);
-    document.getElementById('linear-bar').style.height = '100%';
-    document.getElementById('linear-bar').setAttribute('data-ms', linearTime + ' ms');
 
-    const stringHeight = (parseFloat(stringTime) / maxTime * 100).toFixed(1);
-    document.getElementById('string-bar').style.height = stringHeight + '%';
-    document.getElementById('string-bar').setAttribute('data-ms', stringTime + ' ms');
+    const setBar = (id, timeValue, minPct) => {
+        const heightPct = (parseFloat(timeValue) / maxTime * 100);
+        const finalHeight = Math.max(heightPct, minPct);
+        const bar = document.getElementById(id + '-bar');
+        const value = document.getElementById(id + '-value');
 
-    const binaryHeight = (parseFloat(binaryTime) / maxTime * 100).toFixed(1);
-    document.getElementById('binary-bar').style.height = binaryHeight + '%';
-    document.getElementById('binary-bar').setAttribute('data-ms', binaryTime + ' ms');
+        bar.style.height = finalHeight.toFixed(2) + '%';
+        bar.setAttribute('data-ms', timeValue + ' ms');
+        value.textContent = timeValue + ' ms';
+    };
 
-    const strideHeight = (parseFloat(strideTime) / maxTime * 100).toFixed(1);
-    document.getElementById('stride-bar').style.height = Math.max(strideHeight, 2) + '%';
-    document.getElementById('stride-bar').setAttribute('data-ms', strideTime + ' ms');
-
-    const dhifHeight = (parseFloat(dhifTime) / maxTime * 100).toFixed(2);
-    document.getElementById('dhif-bar').style.height = Math.max(dhifHeight, 1) + '%';
-    document.getElementById('dhif-bar').setAttribute('data-ms', dhifTime + ' ms');
+    setBar('linear', linearTime, 100);
+    setBar('string', stringTime, 18);
+    setBar('binary', binaryTime, 12);
+    setBar('stride', strideTime, 10);
+    setBar('dhif', dhifTime, 10);
 }
 
 function dosAttackIP() {
@@ -267,61 +280,52 @@ function dosAttackIP() {
         return;
     }
 
+    if (isValidIP(ip)) {
+        alert(`Wrong IP selection: ${ip} is an AUTHORIZED address and cannot be used for DoS simulation.`);
+        return;
+    }
+
     const cls = getIPClass(ip);
     const desc = getIPDescription(ip);
 
-    if (!isValidIP(ip)) {
+    if (!isValidIP(ip) && !isDoSSimulationIP(ip)) {
         addLog(ip, 'DoS Attack', 'INVALID', `Rejected: ${ip} - Not in Allowlist`, false);
         return;
     }
 
-    if (cls === 'D') {
-        addLog(ip, 'DoS Attack', 'INVALID', `Invalid: ${desc} - Cannot Attack Multicast Reserved`, false);
+    if (isValidIP(ip) && (cls === 'D' || cls === 'E')) {
+        const reason = cls === 'D'
+            ? `Invalid: ${desc} - Cannot Attack Multicast Reserved`
+            : `Invalid: ${desc} - Cannot Attack Experimental Range`;
+        addLog(ip, 'DoS Attack', 'INVALID', reason, false);
         return;
     }
 
-    if (cls === 'E') {
-        addLog(ip, 'DoS Attack', 'INVALID', `Invalid: ${desc} - Cannot Attack Experimental Range`, false);
-        return;
+    const burstCount = isDoSSimulationIP(ip) ? 8 : 1;
+    for (let i = 0; i < burstCount; i++) {
+        addLog(ip, 'DoS Attack', 'DOS_ATTACK', `DoS Attack: ${desc} - Single Source Flood`, false);
     }
-
-    addLog(ip, 'DoS Attack', 'DOS_ATTACK', `DoS Attack: ${desc} - Single Source Flood`, false);
     updateAttackMetrics([ip], 'dos');
     updateAlgorithmMetrics(true);
 }
 
 function ddosAttackIP() {
-    const ip = document.getElementById('ipInput').value.trim();
-    if (!ip) {
-        alert('Please enter an IP address');
-        return;
-    }
-
-    const desc = getIPDescription(ip);
-    if (!isValidIP(ip)) {
-        addLog(ip, 'DDoS Attack', 'INVALID', `Rejected: ${ip} - Not in Allowlist`, false);
-        return;
-    }
-
     const allIPs = Object.values(validIPs).flat();
-    const randomCount = Math.floor(Math.random() * 3) + 3;
-    const randomIPs = [];
+    const randomIPs = new Set();
 
-    for (let i = 0; i < randomCount; i++) {
-        let randomIP;
-        do {
-            randomIP = allIPs[Math.floor(Math.random() * allIPs.length)];
-        } while (randomIP === ip);
-        randomIPs.push(randomIP);
+    while (randomIPs.size < 10) {
+        const randomIP = allIPs[Math.floor(Math.random() * allIPs.length)];
+        randomIPs.add(randomIP);
     }
 
-    addLog(ip, 'DDoS Attack', 'DDOS_ATTACK', `DDoS Target: ${desc} - ${randomIPs.length} Source Swarm (Input IP Excluded)`, false);
-    for (let randomIP of randomIPs) {
-        const randomDesc = getIPDescription(randomIP);
-        addLog(randomIP, 'DDoS Source', 'DDOS_ATTACKED', `Attack Source: ${randomDesc} - Part of Botnet`, false);
+    const selectedIPs = Array.from(randomIPs);
+
+    for (const targetIP of selectedIPs) {
+        const targetDesc = getIPDescription(targetIP);
+        addLog(targetIP, 'DDoS Attack', 'DDOS_ATTACK', `DDoS Target: ${targetDesc} - Botnet Swarm Detected`, false);
     }
 
-    updateAttackMetrics(randomIPs, 'ddos');
+    updateAttackMetrics(selectedIPs, 'ddos');
     updateAlgorithmMetrics(true);
 }
 
@@ -380,7 +384,7 @@ function updateAttackMetrics(ips, attackType) {
     document.getElementById('metric-recovery').textContent = metrics.recovery + 's';
 }
 
-function addLog(ip, action, status, reason, isAuthorized) {
+function addLogRow(ip, action, status, reason, isAuthorized) {
     const showcase = document.querySelector('.algorithm-showcase');
     showcase.classList.add('active');
 
@@ -398,12 +402,6 @@ function addLog(ip, action, status, reason, isAuthorized) {
     if (status === 'BLOCKED' || status === 'DOS_ATTACK' || status === 'DDOS_ATTACK' || status === 'DDOS_ATTACKED') statusClass = 'status-blocked';
     if (status === 'REJECTED' || status === 'INVALID') statusClass = 'status-invalid';
     if (status === 'BLACKLISTED') statusClass = 'status-blacklisted';
-
-    fetch('/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: action.toLowerCase(), ip })
-    });
 
     const currentRows = tbody.querySelectorAll('tr').length;
     const serialNumber = currentRows + 1;
@@ -423,6 +421,61 @@ function addLog(ip, action, status, reason, isAuthorized) {
         if (slNoCell) slNoCell.textContent = allRows.length - index;
     });
 }
+
+function addLog(ip, action, status, reason, isAuthorized) {
+    fetch('/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: action.toLowerCase(), ip })
+    });
+
+    addLogRow(ip, action, status, reason, isAuthorized);
+}
+
+function ingestBackendLog(entry) {
+    if (!entry || entry.status_code === undefined) {
+        return;
+    }
+
+    const dedupeKey = `${entry.ip}|${entry.status_code}|${entry.latency}`;
+    if (dedupeKey === lastBackendKey) {
+        return;
+    }
+    lastBackendKey = dedupeKey;
+
+    const ip = entry.ip || 'unknown';
+    const latency = entry.latency || 'n/a';
+    let status = 'BLOCKED';
+    let reason = `Backend verdict (${latency})`;
+    let isAuthorized = false;
+
+    if (entry.status_code === 1) {
+        status = 'AUTHORIZED';
+        isAuthorized = true;
+        reason = `Backend authorized (${latency})`;
+    } else if (entry.status_code === 2) {
+        status = 'DOS_ATTACK';
+        reason = `Backend DoS alert (${latency})`;
+    }
+
+    addLogRow(ip, 'Backend', status, reason, isAuthorized);
+}
+
+function pollBackendLogs() {
+    fetch('/data')
+        .then(res => res.json())
+        .then(data => {
+            const logs = data.logs;
+            if (Array.isArray(logs)) {
+                logs.forEach(ingestBackendLog);
+            } else if (logs && typeof logs === 'object') {
+                ingestBackendLog(logs);
+            }
+        })
+        .catch(() => {});
+}
+
+setInterval(pollBackendLogs, 1000);
 
 function clearLog() {
     const showcase = document.querySelector('.algorithm-showcase');

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request
 import json
 import os
 
@@ -20,6 +20,22 @@ def documentation():
 @app.route("/references")
 def references():
     return render_template("references.html")
+
+@app.route("/comparision")
+def comparision():
+    return render_template("comparision.html")
+
+@app.route("/comaprision")
+def comaprision_redirect():
+    return redirect("/comparision", code=301)
+
+@app.route("/hashtable")
+def hashtable():
+    return render_template("hashtable.html")
+
+@app.route("/hash_table")
+def hash_table_redirect():
+    return redirect("/hashtable", code=301)
 
 @app.route("/trigger", methods=["POST"])
 def trigger():
