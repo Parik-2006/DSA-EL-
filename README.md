@@ -6,19 +6,14 @@ A high-performance Network Defense System demonstrating the power of advanced da
 
 ## Project Overview
 
-### Core Technology: DHIF Algorithm
+DSA-EL is a Flask-based Network Defense System demo focused on IP authorization, blocked-IP checks, and algorithm comparison. The UI is served from HTML templates with shared CSS/JS assets, while the backend provides lightweight routes for page rendering, stats/log retrieval, and triggering simulations.
 
-The **Dynamic Hash-Indexed Filter (DHIF)** is an advanced IP filtering algorithm that combines hash-based indexing with stride optimization to achieve constant-time O(1) lookup performance. Unlike traditional approaches:
+### What It Does
 
-* **Traditional Linear Search:** O(n) - Degrades as blocklist grows
-* **Binary Search:** O(log n) - Requires sorted data
-* **DHIF Algorithm:** O(1) - Constant time regardless of dataset size
-
-**Performance Metrics:**
-- Average Search Time: 0.04-0.06ms
-- 30-50x faster than binary search
-- Handles millions of IPs without performance degradation
-- Built-in rate limiting protection
+- Serves the dashboard and documentation pages from `templates/`
+- Loads blocked IPs from `blocked_ips.txt` for client-side validation
+- Emits a command file (`cmd_trigger.txt`) when simulations are triggered
+- Exposes JSON endpoints for stats and logs used by the front end
 
 ### Key Features
 
@@ -36,8 +31,8 @@ The **Dynamic Hash-Indexed Filter (DHIF)** is an advanced IP filtering algorithm
 ### Prerequisites
 
 - Python 3.8 or higher
-- GCC compiler (optional, for C backend)
 - Modern web browser
+- GCC compiler (optional, for `backend.c`)
 
 ### Installation
 
@@ -48,17 +43,32 @@ cd DSA-EL-
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Run the application
+### Run Locally (Flask)
+
+```bash
 python app.py
 ```
 
 Access the dashboard at: `http://localhost:5000`
 
-### Using the Startup Script
+### Run with Gunicorn
 
 ```bash
 bash start.sh
+```
+
+Set `PORT` to change the default port (5000):
+
+```bash
+PORT=8000 bash start.sh
+```
+
+### Optional: Build the C Backend
+
+```bash
+bash build.sh
 ```
 
 ---
