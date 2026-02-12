@@ -9,6 +9,21 @@ BLOCKED_IPS_PATH = "blocked_ips.txt"
 _blocked_ips_cache = {"mtime": None, "data": []}
 
 
+def _is_valid_ipv4(ip):
+    if not isinstance(ip, str):
+        return False
+    parts = ip.strip().split(".")
+    if len(parts) != 4:
+        return False
+    for part in parts:
+        if not part.isdigit():
+            return False
+        value = int(part)
+        if value < 0 or value > 255:
+            return False
+    return True
+
+
 def _load_blocked_ips():
     try:
         mtime = os.path.getmtime(BLOCKED_IPS_PATH)
@@ -61,8 +76,11 @@ def hash_table_redirect():
 @app.route("/trigger", methods=["POST"])
 def trigger():
     data = request.get_json(force=True)
+    ip = data.get("ip")
+    if not _is_valid_ipv4(ip):
+        return jsonify({"status": "error", "message": "Invalid IPv4 address"}), 400
     with open("cmd_trigger.txt", "w") as f:
-        f.write(f"{data['mode']} {data['ip']}")
+        f.write(f"{data['mode']} {ip}")
     return jsonify({"status": "sent"})
 
 @app.route("/blocked_ips")
