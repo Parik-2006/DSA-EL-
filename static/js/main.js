@@ -168,6 +168,30 @@ function getIPClass(ip) {
     return null;
 }
 
+function isValidIPv4(ip) {
+    if (typeof ip !== 'string') return false;
+    const parts = ip.trim().split('.');
+    if (parts.length !== 4) return false;
+    for (const part of parts) {
+        if (!/^[0-9]+$/.test(part)) return false;
+        const value = Number(part);
+        if (value < 0 || value > 255) return false;
+    }
+    return true;
+}
+
+function showInvalidIPAlert() {
+    alert('Invalid IP address. Each number must be in the range 0 to 255.');
+}
+
+function guardValidIPv4(ip) {
+    if (!isValidIPv4(ip)) {
+        showInvalidIPAlert();
+        return false;
+    }
+    return true;
+}
+
 function isValidIP(ip) {
     return getIPClass(ip) !== null;
 }
@@ -206,6 +230,8 @@ function authorizeIP() {
         alert('Please enter an IP address');
         return;
     }
+
+    if (!guardValidIPv4(ip)) return;
 
     if (!isValidIP(ip)) {
         addLog(ip, 'Authorize', 'REJECTED', `Unauthorized: ${ip} - Not in 50 IP Allowlist`, false);
@@ -279,6 +305,8 @@ function dosAttackIP() {
         alert('Please enter an IP address');
         return;
     }
+
+    if (!guardValidIPv4(ip)) return;
 
     if (isValidIP(ip)) {
         alert(`Wrong IP selection: ${ip} is an AUTHORIZED address and cannot be used for DoS simulation.`);
@@ -423,6 +451,7 @@ function addLogRow(ip, action, status, reason, isAuthorized) {
 }
 
 function addLog(ip, action, status, reason, isAuthorized) {
+    if (!guardValidIPv4(ip)) return;
     fetch('/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
