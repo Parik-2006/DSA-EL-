@@ -122,3 +122,10 @@ This project was developed as part of the **Data Structures and Applications (DS
 
 Educational Research Purpose - RVCE CSE 2025.
 
+
+🤝 Contributing & Issues
+This project is open for viewing. Direct changes are restricted.
+
+Found a bug? Please Open a New Issue and describe the problem.
+Want to fix it? Please Fork the repo and submit a Pull Request (PR) for review.
+
