@@ -1,3 +1,5 @@
+Here is the updated README with the **Contributing & Issues** section moved to the very end, following the license, to match your requested structure.
+
 # 🛡️ Next-Gen Network Defense: Legacy vs. Trie-Based Firewall
 
 > **A High-Performance Packet Filtering Engine.**
@@ -122,10 +124,13 @@ This project was developed as part of the **Data Structures and Applications (DS
 
 Educational Research Purpose - RVCE CSE 2025.
 
+---
 
-🤝 Contributing & Issues
-This project is open for viewing. Direct changes are restricted.
+### 🤝 Contributing & Issues
 
-Found a bug? Please Open a New Issue and describe the problem.
-Want to fix it? Please Fork the repo and submit a Pull Request (PR) for review.
+This project is open for viewing. **Direct changes are restricted.**
 
+* **Found a bug?** Please [Open a New Issue](https://www.google.com/search?q=https://github.com/Parik-2006/DSA-EL-/issues/new) and describe the problem.
+* **Want to fix it?** Please Fork the repo and submit a Pull Request (PR) for review.
+
+Would you like me to help you create a specific "How to contribute" guide for people who want to fork your project?
