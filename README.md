@@ -1,5 +1,3 @@
-Here is the updated README with the **Contributing & Issues** section moved to the very end, following the license, to match your requested structure.
-
 # 🛡️ Next-Gen Network Defense: Legacy vs. Trie-Based Firewall
 
 > **A High-Performance Packet Filtering Engine.**
